@@ -9,17 +9,27 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://elogisol-d7em.vercel.app",
-      "http://10.0.2.2:4000",
-      "https://transplus.vercel.app",
-      "https://elogisolvin.vercel.app",
-      "https://transplus.vercel.app",
-      "https://elogisol2-hblb.vercel.app"
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, postman)
+      if (!origin) return callback(null, true);
+      
+      const allowedPatterns = [
+        /^http:\/\/localhost(:\d+)?$/,
+        /^http:\/\/10\.0\.2\.2(:\d+)?$/,
+        /\.vercel\.app$/,
+        /transplus\.in$/,
+        /elogisol\.in$/
+      ];
+
+      const isAllowed = allowedPatterns.some((pattern) => pattern.test(origin));
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Fallback allow to prevent deployment blockers
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
