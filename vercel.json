@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd elogisol2-main && npm install && npm run build",
+  "outputDirectory": "elogisol2-main/build",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
