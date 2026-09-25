@@ -51,17 +51,17 @@ const ServiceRequestForm = ({
 
   const currentNoOfVehicles = parseInt(safeRequestData.no_of_vehicles) || 1;
 
-  // Calculate total charge from service prices
+  // Calculate total charge directly from service prices
   const calculateTotalCharge = () => {
     const servicePrices = safeRequestData.service_prices || {};
     const totalServiceCharge = Object.values(servicePrices).reduce(
       (sum, price) => sum + (parseFloat(price) || 0),
       0
     );
-    return totalServiceCharge * currentNoOfVehicles;
+    return totalServiceCharge;
   };
 
-  // Update requested_price whenever service prices or number of vehicles change
+  // Update requested_price whenever service prices change
   useEffect(() => {
     const newRequestedPrice = calculateTotalCharge();
     if (newRequestedPrice !== safeRequestData.requested_price) {
@@ -70,7 +70,7 @@ const ServiceRequestForm = ({
         requested_price: newRequestedPrice,
       }));
     }
-  }, [safeRequestData.service_prices, currentNoOfVehicles]);
+  }, [safeRequestData.service_prices]);
 
   // Helper function to create transporter details array based on number of vehicles
   const createTransporterDetailsArray = (numVehicles, existingDetails = []) => {

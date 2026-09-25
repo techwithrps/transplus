@@ -41,14 +41,14 @@ const PricingScheduleSection = ({
     setRequestData,
   ]);
 
-  // Calculate total charge from service prices
+  // Calculate total charge directly from service prices
   const calculateTotalCharge = () => {
     const servicePrices = safeRequestData.service_prices || {};
     const totalServiceCharge = Object.values(servicePrices).reduce(
       (sum, price) => sum + (parseFloat(price) || 0),
       0
     );
-    return totalServiceCharge * currentNoOfVehicles;
+    return totalServiceCharge;
   };
 
   const totalCharge = calculateTotalCharge();
@@ -84,18 +84,8 @@ const PricingScheduleSection = ({
                   </div>
                 )
               )}
-              <div className="border-t pt-1 mt-2">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal per vehicle:</span>
-                  <span>
-                    ₹
-                    {Object.values(safeRequestData.service_prices).reduce(
-                      (sum, price) => sum + (parseFloat(price) || 0),
-                      0
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between font-bold text-lg border-t pt-1 mt-1">
+              <div className="border-t pt-2 mt-2">
+                <div className="flex justify-between font-bold text-lg">
                   <span>Total Charge:</span>
                   <span>₹{totalCharge.toFixed(2)}</span>
                 </div>
