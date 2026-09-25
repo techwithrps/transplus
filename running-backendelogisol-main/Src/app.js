@@ -71,6 +71,14 @@ app.use("/api", equipmentRoutes);
 app.use("/api", vehiicleRoutes);
 app.use("/api", asnRoutes);
 app.use("/api/payment-receipts", paymentReceiptRoutes); // Payment receipts routes
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Transplus API Server is running",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,

@@ -99,8 +99,16 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Verify password with case tolerance (handles Transplus@123, transplus@123, etc.)
+    let isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid && typeof password === "string") {
+      const altCapital = password.charAt(0).toUpperCase() + password.slice(1);
+      const altLower = password.toLowerCase();
+      isPasswordValid =
+        (await bcrypt.compare(altCapital, user.password)) ||
+        (await bcrypt.compare(altLower, user.password));
+    }
+
     if (!isPasswordValid) {
       return res.status(401).json({
         message: "Invalid credentials",

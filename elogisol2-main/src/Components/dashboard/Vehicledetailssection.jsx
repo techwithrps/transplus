@@ -249,15 +249,17 @@ const VehicleDetailsSection = ({
                   className="w-full border rounded-md p-2"
                   placeholder="Enter number of 20ft containers"
                   value={safeRequestData.containers_20ft || ""}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const c20 = Number(e.target.value) || 0;
+                    const c40 = Number(safeRequestData.containers_40ft) || 0;
+                    const total = c20 + c40;
                     setRequestData((prev) => ({
                       ...prev,
-                      containers_20ft: Number(e.target.value) || 0,
-                      total_containers:
-                        (Number(e.target.value) || 0) +
-                        (Number(prev.containers_40ft) || 0),
-                    }))
-                  }
+                      containers_20ft: c20,
+                      total_containers: total,
+                      no_of_vehicles: total > 0 ? total : 1,
+                    }));
+                  }}
                 />
               </div>
             </div>
@@ -274,15 +276,17 @@ const VehicleDetailsSection = ({
                     className="w-full border rounded-md p-2"
                     placeholder="Enter number of 40ft containers"
                     value={safeRequestData.containers_40ft || ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const c20 = Number(safeRequestData.containers_20ft) || 0;
+                      const c40 = Number(e.target.value) || 0;
+                      const total = c20 + c40;
                       setRequestData((prev) => ({
                         ...prev,
-                        containers_40ft: Number(e.target.value) || 0,
-                        total_containers:
-                          (Number(prev.containers_20ft) || 0) +
-                          (Number(e.target.value) || 0),
-                      }))
-                    }
+                        containers_40ft: c40,
+                        total_containers: total,
+                        no_of_vehicles: total > 0 ? total : 1,
+                      }));
+                    }}
                   />
                 </div>
               </div>
