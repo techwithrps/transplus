@@ -507,7 +507,7 @@ export const TransporterDetails = ({
   };
 
   const addVehicle = () => {
-    const maxVehicles = parseInt(numberOfVehicles);
+    const maxVehicles = parseInt(numberOfVehicles) || 27;
     if (vehicleCount >= maxVehicles) {
       toast.warning(
         `Cannot add more vehicles. Maximum allowed: ${maxVehicles}`

@@ -548,6 +548,11 @@ export default function CustomerDashboard({
               />
               <TransporterDetails
                 transportRequestId={requestData.id}
+                numberOfVehicles={
+                  requestData.no_of_vehicles ||
+                  requestData.total_containers ||
+                  27
+                }
                 transporterData={transporterData}
                 setTransporterData={setTransporterData}
                 isEditMode={Boolean(requestData.id)}
