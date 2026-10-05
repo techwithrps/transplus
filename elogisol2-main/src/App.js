@@ -34,6 +34,7 @@ import ContainerAssignmentDashboard from "./Pages/Containeradminpage";
 import DailyAdvancePaymentsReport from "./Pages/DailyAdvancePaymentsReport";
 import ContainerMarginReport from "./Pages/ContainerMarginReport";
 import PaymentReceipts from "./Pages/PaymentReceipts";
+import TransporterTreeDemo from "./Pages/TransporterTreeDemo";
 
 const DashboardLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -109,6 +110,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/transporter-tree-demo" element={<TransporterTreeDemo />} />
+          <Route path="/demo" element={<TransporterTreeDemo />} />
           {/* Admin routes - AdminLayout handles its own sidebar */}
           <Route
             path="/admin-dashboard/*"
