@@ -11,14 +11,14 @@ import {
   ChevronUp,
   User,
   Building2,
-  CheckCircle2,
   Save,
+  Phone,
 } from "lucide-react";
 
-// Branded Truck Illustration with "Transplus" logo
+// Compact Branded Truck Illustration
 const BrandedTruckIllustration = ({ color = "#1e40af", vendor = "CARAVAN" }) => {
   const isRed =
-    color.toLowerCase().includes("dc2626") ||
+    color?.toLowerCase().includes("dc2626") ||
     vendor?.toUpperCase().includes("SANGAM") ||
     vendor?.toUpperCase().includes("DEV");
   const trailerColor = isRed ? "#b91c1c" : "#1e40af";
@@ -27,121 +27,71 @@ const BrandedTruckIllustration = ({ color = "#1e40af", vendor = "CARAVAN" }) => 
   return (
     <div className="relative flex items-center justify-center select-none shrink-0">
       <svg
-        viewBox="0 0 160 56"
-        className="w-24 h-9 drop-shadow-xs transition-transform duration-200 hover:scale-105"
+        viewBox="0 0 140 46"
+        className="w-20 h-7 drop-shadow-xs"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M6 38H18V18C18 16.5 19.5 15 21 15H36V38H42"
+          d="M4 32H15V15C15 13.5 16.5 12 18 12H30V32H35"
           stroke="#334155"
-          strokeWidth="2.5"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M18 20L25 15H38V38H18V20Z"
+          d="M15 16L21 12H32V32H15V16Z"
           fill={cabColor}
           stroke="#1e293b"
-          strokeWidth="1.5"
+          strokeWidth="1.2"
         />
         <path
-          d="M20 21L25 17H34V26H20V21Z"
+          d="M17 17L21 14H28V22H17V17Z"
           fill="#e2e8f0"
           stroke="#0f172a"
-          strokeWidth="1"
+          strokeWidth="0.8"
         />
-        <rect x="4" y="36" width="10" height="5" rx="2" fill="#64748b" />
-        <rect x="38" y="32" width="12" height="6" fill="#475569" />
+        <rect x="3" y="30" width="8" height="4" rx="1.5" fill="#64748b" />
+        <rect x="32" y="27" width="9" height="5" fill="#475569" />
         <rect
-          x="48"
-          y="6"
-          width="106"
-          height="34"
-          rx="3"
+          x="40"
+          y="4"
+          width="96"
+          height="28"
+          rx="2.5"
           fill={trailerColor}
-          stroke="#0f172a"
-          strokeWidth="2"
-        />
-        <line x1="56" y1="6" x2="56" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="66" y1="6" x2="66" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="76" y1="6" x2="76" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="86" y1="6" x2="86" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="96" y1="6" x2="96" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="106" y1="6" x2="106" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="116" y1="6" x2="116" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="126" y1="6" x2="126" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="136" y1="6" x2="136" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="146" y1="6" x2="146" y2="40" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <text
-          x="101"
-          y="26"
-          fill="#ffffff"
-          fontSize="13"
-          fontWeight="900"
-          fontStyle="italic"
-          fontFamily="system-ui, -apple-system, sans-serif"
-          textAnchor="middle"
-          letterSpacing="0.5"
-        >
-          Transplus
-        </text>
-        <line x1="52" y1="41" x2="148" y2="41" stroke="#334155" strokeWidth="3" />
-        <circle cx="22" cy="42" r="7" fill="#1e293b" stroke="#64748b" strokeWidth="2" />
-        <circle cx="22" cy="42" r="3" fill="#cbd5e1" />
-        <circle cx="120" cy="42" r="7" fill="#1e293b" stroke="#64748b" strokeWidth="2" />
-        <circle cx="120" cy="42" r="3" fill="#cbd5e1" />
-        <circle cx="138" cy="42" r="7" fill="#1e293b" stroke="#64748b" strokeWidth="2" />
-        <circle cx="138" cy="42" r="3" fill="#cbd5e1" />
-      </svg>
-    </div>
-  );
-};
-
-// Branded Mini Container
-const BrandedContainerIllustration = ({ color = "#1e40af", size = "20ft" }) => {
-  const isRed = color.toLowerCase().includes("dc2626") || color.toLowerCase().includes("red");
-  const boxColor = isRed ? "#b91c1c" : "#1e40af";
-
-  return (
-    <div className="relative flex items-center justify-center select-none shrink-0">
-      <svg
-        viewBox="0 0 110 42"
-        className="w-18 h-7 drop-shadow-xs"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect
-          x="2"
-          y="2"
-          width="106"
-          height="38"
-          rx="3"
-          fill={boxColor}
           stroke="#0f172a"
           strokeWidth="1.5"
         />
-        <line x1="12" y1="3" x2="12" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="22" y1="3" x2="22" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="32" y1="3" x2="32" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="42" y1="3" x2="42" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="52" y1="3" x2="52" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="62" y1="3" x2="62" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="72" y1="3" x2="72" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="82" y1="3" x2="82" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
-        <line x1="92" y1="3" x2="92" y2="39" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" />
+        <line x1="48" y1="4" x2="48" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="58" y1="4" x2="58" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="68" y1="4" x2="68" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="78" y1="4" x2="78" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="88" y1="4" x2="88" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="98" y1="4" x2="98" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="108" y1="4" x2="108" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="118" y1="4" x2="118" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        <line x1="128" y1="4" x2="128" y2="32" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
         <text
-          x="55"
-          y="24"
+          x="88"
+          y="21"
           fill="#ffffff"
           fontSize="11"
           fontWeight="900"
           fontStyle="italic"
           fontFamily="system-ui, sans-serif"
           textAnchor="middle"
+          letterSpacing="0.4"
         >
           Transplus
         </text>
+        <line x1="44" y1="33" x2="132" y2="33" stroke="#334155" strokeWidth="2.5" />
+        <circle cx="18" cy="35" r="5.5" fill="#1e293b" stroke="#64748b" strokeWidth="1.5" />
+        <circle cx="18" cy="35" r="2" fill="#cbd5e1" />
+        <circle cx="106" cy="35" r="5.5" fill="#1e293b" stroke="#64748b" strokeWidth="1.5" />
+        <circle cx="106" cy="35" r="2" fill="#cbd5e1" />
+        <circle cx="122" cy="35" r="5.5" fill="#1e293b" stroke="#64748b" strokeWidth="1.5" />
+        <circle cx="122" cy="35" r="2" fill="#cbd5e1" />
       </svg>
     </div>
   );
@@ -239,8 +189,6 @@ export const TransporterDetails = ({
 
       if (response.success && Array.isArray(response.data) && response.data.length > 0) {
         const rows = response.data;
-
-        // Group rows by vehicle_number (or vehicle_sequence if vehicle_number is empty)
         const vehicleMap = new Map();
 
         rows.forEach((row, rIdx) => {
@@ -255,7 +203,6 @@ export const TransporterDetails = ({
             }
           }
 
-          // Extract numeric service charge
           const firstServiceCharge = Object.values(serviceChargesObj)[0] || row.total_charge || 0;
           const vendorCharge = parseFloat(firstServiceCharge) || parseFloat(row.base_charge) || 0;
           const additionalCharge = parseFloat(row.additional_charges) || 0;
@@ -320,21 +267,18 @@ export const TransporterDetails = ({
     }
   }, [transportRequestId]);
 
-  // Expand / collapse vehicle
   const toggleVehicleExpand = (vIdx) => {
     setNestedVehicles((prev) =>
       prev.map((v, idx) => (idx === vIdx ? { ...v, isExpanded: !v.isExpanded } : v))
     );
   };
 
-  // Add new vehicle
   const handleAddVehicle = () => {
     const nextIdx = nestedVehicles.length + 1;
     setNestedVehicles((prev) => [...prev, createDefaultVehicle(nextIdx)]);
     toast.success(`Vehicle #${nextIdx} added`);
   };
 
-  // Remove vehicle
   const handleRemoveVehicle = (vIdx = null) => {
     if (nestedVehicles.length <= 1) {
       toast.warning("At least 1 vehicle is required");
@@ -348,7 +292,6 @@ export const TransporterDetails = ({
     toast.info("Vehicle removed");
   };
 
-  // Update vehicle header field (driver, vehicleNumber, vendor)
   const handleUpdateVehicleField = (vIdx, field, value) => {
     setNestedVehicles((prev) =>
       prev.map((v, idx) => {
@@ -366,7 +309,6 @@ export const TransporterDetails = ({
     );
   };
 
-  // Add container inside vehicle
   const handleAddContainer = (vIdx) => {
     setNestedVehicles((prev) =>
       prev.map((v, idx) => {
@@ -383,7 +325,6 @@ export const TransporterDetails = ({
     toast.success(`Container added to Vehicle #${vIdx + 1}`);
   };
 
-  // Delete container inside vehicle
   const handleDeleteContainer = (vIdx, cIdx) => {
     setNestedVehicles((prev) =>
       prev.map((v, idx) => {
@@ -403,7 +344,6 @@ export const TransporterDetails = ({
     toast.info("Container deleted");
   };
 
-  // Update container field
   const handleUpdateContainerField = (vIdx, cIdx, field, value) => {
     setNestedVehicles((prev) =>
       prev.map((v, idx) => {
@@ -429,7 +369,7 @@ export const TransporterDetails = ({
     );
   };
 
-  // Calculation helpers
+  // Calculations
   const calculateVehicleTotals = (vehicle) => {
     const vendorSum = vehicle.containers.reduce(
       (sum, c) => sum + (parseFloat(c.vendorCharges) || 0),
@@ -463,7 +403,6 @@ export const TransporterDetails = ({
     0
   );
 
-  // Save all transporter details
   const handleSaveAll = async (e) => {
     if (e) e.preventDefault();
     if (!transportRequestId) {
@@ -477,7 +416,6 @@ export const TransporterDetails = ({
     });
 
     try {
-      // Flatten nested tree into backend database rows
       const flatPayload = [];
       let seq = 1;
 
@@ -509,7 +447,6 @@ export const TransporterDetails = ({
         });
       });
 
-      // Submit new or updated rows
       const createResponse = await transporterAPI.createMultipleVehicles(
         transportRequestId,
         flatPayload
@@ -541,33 +478,33 @@ export const TransporterDetails = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl shadow-xs border border-slate-200 mt-6 p-8 text-center">
+      <div className="bg-white rounded-xl border border-slate-200 mt-6 p-8 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="text-sm text-slate-500 font-medium mt-3">Loading Transporter Details...</p>
+        <p className="text-xs text-slate-500 font-medium mt-3">Loading Transporter Details...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-xs border border-slate-200 mt-6 overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200 mt-6 overflow-hidden shadow-xs">
       {/* HEADER BAR */}
-      <div className="px-6 py-4 border-b border-slate-200 bg-white flex flex-wrap items-center justify-between gap-4">
+      <div className="px-5 py-3.5 border-b border-slate-200 bg-white flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+          <h3 className="text-lg font-bold text-slate-900 tracking-tight">
             Transporter Details
           </h3>
           {transportRequestId && (
-            <p className="text-xs font-semibold text-slate-500 mt-0.5">
-              Request ID: <span className="text-slate-800">{transportRequestId}</span>
+            <p className="text-[11px] font-semibold text-slate-500">
+              Request ID: <span className="text-slate-800 font-bold">{transportRequestId}</span>
             </p>
           )}
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           <button
             type="button"
             onClick={handleAddVehicle}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg shadow-xs transition-all active:scale-95"
+            className="flex items-center space-x-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg shadow-xs transition-all active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Vehicle</span>
@@ -577,9 +514,9 @@ export const TransporterDetails = ({
             type="button"
             onClick={() => handleRemoveVehicle()}
             disabled={nestedVehicles.length <= 1}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95 ${
               nestedVehicles.length <= 1
-                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
                 : "bg-rose-600 hover:bg-rose-700 text-white shadow-xs"
             }`}
           >
@@ -589,161 +526,141 @@ export const TransporterDetails = ({
         </div>
       </div>
 
-      {/* NESTED VEHICLE & CONTAINER CARDS */}
-      <div className="p-6 space-y-4 bg-slate-50/50">
+      {/* NESTED VEHICLES LIST */}
+      <div className="p-4 space-y-3 bg-slate-50/40">
         {nestedVehicles.map((vehicle, vIdx) => {
           const totals = calculateVehicleTotals(vehicle);
 
           return (
             <div
               key={vehicle.id || `v-${vIdx}`}
-              className="bg-white border border-slate-200 rounded-xl shadow-xs transition-all duration-200 hover:border-slate-300 overflow-hidden"
+              className="bg-white border border-slate-200 rounded-xl shadow-xs transition-all hover:border-slate-300 overflow-hidden"
             >
-              {/* VEHICLE HEADER CARD */}
+              {/* VEHICLE HEADER CARD - CLEAN 2-ROW RESPONSIVE LAYOUT */}
               <div
                 onClick={() => toggleVehicleExpand(vIdx)}
-                className={`p-4 flex flex-wrap items-center justify-between gap-4 cursor-pointer select-none transition-colors ${
+                className={`p-3.5 cursor-pointer select-none transition-colors ${
                   vehicle.isExpanded ? "bg-slate-50/90 border-b border-slate-200" : "hover:bg-slate-50/50"
                 }`}
               >
-                {/* Badge + Truck + Vehicle Number */}
-                <div className="flex items-center space-x-3.5">
-                  <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0 border border-blue-200 shadow-xs">
-                    {vIdx + 1}
-                  </div>
-
-                  <BrandedTruckIllustration
-                    color={vehicle.vendorColor}
-                    vendor={vehicle.vendorName}
-                  />
-
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      Vehicle Number
+                {/* ROW 1: Identifier + Rollup charges + Chevron */}
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  {/* Left: Badge + Truck + Vehicle Number + Vendor */}
+                  <div className="flex items-center space-x-2.5 flex-wrap gap-y-1">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0 border border-blue-200">
+                      {vIdx + 1}
                     </div>
-                    <input
-                      type="text"
-                      value={vehicle.vehicleNumber}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) =>
-                        handleUpdateVehicleField(
-                          vIdx,
-                          "vehicleNumber",
-                          e.target.value.toUpperCase()
-                        )
-                      }
-                      placeholder="HR55BC1677"
-                      className="text-xs font-bold text-blue-600 bg-blue-50/90 px-2 py-0.5 rounded border border-blue-200 w-28 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+
+                    <BrandedTruckIllustration
+                      color={vehicle.vendorColor}
+                      vendor={vehicle.vendorName}
                     />
-                  </div>
-                </div>
 
-                {/* Driver */}
-                <div className="flex items-center space-x-2">
-                  <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-blue-600">
-                    <User className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      Driver
-                    </div>
-                    <div className="flex items-center space-x-1.5" onClick={(e) => e.stopPropagation()}>
+                    {/* Vehicle Number Input */}
+                    <div className="flex items-center space-x-1" onClick={(e) => e.stopPropagation()}>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">No:</span>
                       <input
                         type="text"
-                        value={vehicle.driverName}
+                        value={vehicle.vehicleNumber}
                         onChange={(e) =>
-                          handleUpdateVehicleField(vIdx, "driverName", e.target.value)
+                          handleUpdateVehicleField(
+                            vIdx,
+                            "vehicleNumber",
+                            e.target.value.toUpperCase()
+                          )
                         }
-                        placeholder="Driver Name"
-                        className="text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded px-1.5 py-0.5 w-24 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                        placeholder="HR55BC1677"
+                        className="text-xs font-bold text-blue-600 bg-blue-50/90 px-2 py-0.5 rounded border border-blue-200 w-28 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                       />
+                    </div>
+
+                    {/* Vendor Input */}
+                    <div className="flex items-center space-x-1" onClick={(e) => e.stopPropagation()}>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Vendor:</span>
                       <input
                         type="text"
-                        value={vehicle.driverContact}
+                        value={vehicle.vendorName}
                         onChange={(e) =>
-                          handleUpdateVehicleField(vIdx, "driverContact", e.target.value)
+                          handleUpdateVehicleField(vIdx, "vendorName", e.target.value)
                         }
-                        placeholder="Contact"
-                        className="text-xs font-normal text-slate-500 bg-white border border-slate-200 rounded px-1.5 py-0.5 w-24 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Vendor Name"
+                        className="text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded px-2 py-0.5 w-32 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                       />
                     </div>
                   </div>
+
+                  {/* Right: Rollup Charges Pills + Toggle */}
+                  <div className="flex items-center space-x-3 shrink-0">
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-400 font-medium mr-1.5">Vendor:</span>
+                      <span className="text-xs font-bold text-slate-800">
+                        ₹{totals.vendorCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-400 font-medium mr-1.5">Total:</span>
+                      <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        ₹{totals.totalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+
+                    <div className="text-slate-400 hover:text-slate-600 ml-1">
+                      {vehicle.isExpanded ? (
+                        <ChevronUp className="w-4 h-4 text-blue-600" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Vendor Name */}
-                <div className="flex items-center space-x-2">
-                  <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-                    <Building2 className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      Vendor
-                    </div>
+                {/* ROW 2: Driver Info Subline */}
+                <div
+                  className="mt-2 pt-2 border-t border-slate-200/60 flex items-center space-x-4 text-xs text-slate-600"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center space-x-1.5">
+                    <User className="w-3.5 h-3.5 text-blue-500" />
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Driver:</span>
                     <input
                       type="text"
-                      value={vehicle.vendorName}
-                      onClick={(e) => e.stopPropagation()}
+                      value={vehicle.driverName}
                       onChange={(e) =>
-                        handleUpdateVehicleField(vIdx, "vendorName", e.target.value)
+                        handleUpdateVehicleField(vIdx, "driverName", e.target.value)
                       }
-                      placeholder="Vendor Name"
-                      className="text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded px-2 py-0.5 w-36 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                      placeholder="Driver Name"
+                      className="text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded px-1.5 py-0.5 w-28 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
-                </div>
 
-                {/* Rollup Charges & Chevron */}
-                <div className="flex items-center space-x-5">
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right">
-                      Vendor Charges
-                    </div>
-                    <div className="text-xs font-bold text-slate-800 text-right">
-                      ₹ {totals.vendorCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right">
-                      Additional Charges
-                    </div>
-                    <div className="text-xs font-bold text-slate-800 text-right">
-                      ₹ {totals.additionalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right">
-                      Total Charges
-                    </div>
-                    <div className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded border border-blue-200 text-right">
-                      ₹ {totals.totalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-
-                  <div className="text-slate-400 hover:text-slate-600">
-                    {vehicle.isExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-blue-600" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4" />
-                    )}
+                  <div className="flex items-center space-x-1.5">
+                    <Phone className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Contact:</span>
+                    <input
+                      type="text"
+                      value={vehicle.driverContact}
+                      onChange={(e) =>
+                        handleUpdateVehicleField(vIdx, "driverContact", e.target.value)
+                      }
+                      placeholder="0000000000"
+                      className="text-xs font-normal text-slate-600 bg-white border border-slate-200 rounded px-1.5 py-0.5 w-28 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* EXPANDED CONTAINER TREE */}
+              {/* EXPANDED CONTAINER TREE SECTION */}
               {vehicle.isExpanded && (
-                <div className="p-4 bg-slate-50/60 border-t border-slate-100">
-                  <div className="relative pl-5">
-                    {/* Visual Vertical Connector Line */}
-                    <div className="absolute left-2 top-0 bottom-4 w-0.5 bg-blue-300" />
+                <div className="p-3.5 bg-slate-50/70 border-t border-slate-100">
+                  <div className="relative pl-4">
+                    {/* Visual Tree Connector Line */}
+                    <div className="absolute left-1.5 top-0 bottom-4 w-0.5 bg-blue-300" />
 
-                    {/* Container Section Header */}
-                    <div className="flex items-center justify-between mb-2.5">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 rounded bg-blue-100 text-blue-600 flex items-center justify-center">
-                          <Package className="w-3 h-3" />
-                        </div>
+                    {/* Section Header */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-1.5">
+                        <Package className="w-3.5 h-3.5 text-blue-600" />
                         <span className="font-bold text-slate-800 text-xs">
                           Containers ({vehicle.containers.length})
                         </span>
@@ -752,28 +669,27 @@ export const TransporterDetails = ({
                       <button
                         type="button"
                         onClick={() => handleAddContainer(vIdx)}
-                        className="flex items-center space-x-1 text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded border border-blue-200 transition-colors"
+                        className="flex items-center space-x-1 text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition-colors"
                       >
                         <Plus className="w-3 h-3" />
                         <span>Add Container</span>
                       </button>
                     </div>
 
-                    {/* Container Table */}
+                    {/* Compact Container Table - Perfectly aligned */}
                     <div className="bg-white rounded-lg border border-slate-200 shadow-xs overflow-x-auto">
-                      <table className="w-full text-left border-collapse text-xs">
+                      <table className="w-full text-left border-collapse text-[11px]">
                         <thead>
-                          <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
-                            <th className="py-2 px-2.5 w-10 text-center">#</th>
-                            <th className="py-2 px-2.5 w-24 text-center">Preview</th>
-                            <th className="py-2 px-2.5 min-w-[130px]">Container Number</th>
-                            <th className="py-2 px-2.5 w-20">Size</th>
-                            <th className="py-2 px-2.5 min-w-[110px]">Line</th>
-                            <th className="py-2 px-2.5 min-w-[100px]">Seal Number</th>
-                            <th className="py-2 px-2.5 min-w-[110px] text-right">Vendor Charges (₹)</th>
-                            <th className="py-2 px-2.5 min-w-[110px] text-right">Additional Charges (₹)</th>
-                            <th className="py-2 px-2.5 min-w-[110px] text-right">Total Charges (₹)</th>
-                            <th className="py-2 px-2.5 w-10 text-center">Action</th>
+                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[9px]">
+                            <th className="py-1.5 px-2 w-7 text-center">#</th>
+                            <th className="py-1.5 px-2 min-w-[120px]">Container No</th>
+                            <th className="py-1.5 px-1.5 w-16">Size</th>
+                            <th className="py-1.5 px-2 min-w-[100px]">Line</th>
+                            <th className="py-1.5 px-2 min-w-[90px]">Seal No</th>
+                            <th className="py-1.5 px-2 min-w-[90px] text-right">Vendor (₹)</th>
+                            <th className="py-1.5 px-2 min-w-[80px] text-right">Addnl (₹)</th>
+                            <th className="py-1.5 px-2 min-w-[90px] text-right">Total (₹)</th>
+                            <th className="py-1.5 px-1.5 w-8 text-center">Del</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -783,21 +699,12 @@ export const TransporterDetails = ({
                               (parseFloat(container.additionalCharges) || 0);
 
                             return (
-                              <tr key={container.clientId || `c-${cIdx}`} className="hover:bg-blue-50/30">
-                                <td className="py-2.5 px-2.5 text-center font-bold text-slate-600">
-                                  <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-slate-100 text-blue-600 text-[10px] border border-slate-200">
-                                    {cIdx + 1}
-                                  </span>
+                              <tr key={container.clientId || `c-${cIdx}`} className="hover:bg-blue-50/20">
+                                <td className="py-1.5 px-2 text-center font-bold text-slate-500">
+                                  {cIdx + 1}
                                 </td>
 
-                                <td className="py-2.5 px-2.5 text-center">
-                                  <BrandedContainerIllustration
-                                    color={vehicle.vendorColor}
-                                    size={container.size}
-                                  />
-                                </td>
-
-                                <td className="py-2.5 px-2.5">
+                                <td className="py-1.5 px-2">
                                   <input
                                     type="text"
                                     value={container.containerNumber}
@@ -809,12 +716,12 @@ export const TransporterDetails = ({
                                         e.target.value.toUpperCase()
                                       )
                                     }
-                                    className="w-full font-bold text-blue-600 bg-blue-50/80 border border-blue-200 rounded px-2 py-0.5 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                    className="w-full font-bold text-blue-600 bg-blue-50/80 border border-blue-200 rounded px-1.5 py-0.5 text-[11px] focus:ring-1 focus:ring-blue-500 focus:outline-none uppercase"
                                     placeholder="MSKU1234567"
                                   />
                                 </td>
 
-                                <td className="py-2.5 px-2.5">
+                                <td className="py-1.5 px-1.5">
                                   <select
                                     value={container.size}
                                     onChange={(e) =>
@@ -825,14 +732,14 @@ export const TransporterDetails = ({
                                         e.target.value
                                       )
                                     }
-                                    className="font-bold text-slate-700 bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 text-xs focus:outline-none"
+                                    className="font-bold text-slate-700 bg-slate-100 border border-slate-200 rounded px-1 py-0.5 text-[10px] focus:outline-none w-14"
                                   >
                                     <option value="20ft">20ft</option>
                                     <option value="40ft">40ft</option>
                                   </select>
                                 </td>
 
-                                <td className="py-2.5 px-2.5">
+                                <td className="py-1.5 px-2">
                                   <input
                                     type="text"
                                     value={container.line}
@@ -844,12 +751,12 @@ export const TransporterDetails = ({
                                         e.target.value
                                       )
                                     }
-                                    className="w-full font-semibold text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs focus:outline-none"
+                                    className="w-full font-semibold text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none"
                                     placeholder="DP WORLD"
                                   />
                                 </td>
 
-                                <td className="py-2.5 px-2.5">
+                                <td className="py-1.5 px-2">
                                   <input
                                     type="text"
                                     value={container.sealNumber}
@@ -861,12 +768,12 @@ export const TransporterDetails = ({
                                         e.target.value
                                       )
                                     }
-                                    className="w-full font-medium text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs focus:outline-none"
+                                    className="w-full font-medium text-slate-700 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none"
                                     placeholder="SL1234"
                                   />
                                 </td>
 
-                                <td className="py-2.5 px-2.5 text-right">
+                                <td className="py-1.5 px-2 text-right">
                                   <input
                                     type="number"
                                     value={container.vendorCharges}
@@ -878,12 +785,12 @@ export const TransporterDetails = ({
                                         e.target.value
                                       )
                                     }
-                                    className="w-24 font-semibold text-slate-800 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs text-right focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                    className="w-20 font-semibold text-slate-800 bg-white border border-slate-200 rounded px-1 py-0.5 text-[11px] text-right focus:ring-1 focus:ring-blue-500 focus:outline-none"
                                     min="0"
                                   />
                                 </td>
 
-                                <td className="py-2.5 px-2.5 text-right">
+                                <td className="py-1.5 px-2 text-right">
                                   <input
                                     type="number"
                                     value={container.additionalCharges}
@@ -895,22 +802,22 @@ export const TransporterDetails = ({
                                         e.target.value
                                       )
                                     }
-                                    className="w-24 font-semibold text-slate-800 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs text-right focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                    className="w-16 font-semibold text-slate-800 bg-white border border-slate-200 rounded px-1 py-0.5 text-[11px] text-right focus:ring-1 focus:ring-blue-500 focus:outline-none"
                                     min="0"
                                   />
                                 </td>
 
-                                <td className="py-2.5 px-2.5 text-right">
-                                  <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                                    ₹ {cTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                <td className="py-1.5 px-2 text-right">
+                                  <span className="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 text-[11px]">
+                                    ₹{cTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                                   </span>
                                 </td>
 
-                                <td className="py-2.5 px-2.5 text-center">
+                                <td className="py-1.5 px-1.5 text-center">
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteContainer(vIdx, cIdx)}
-                                    className="text-slate-400 hover:text-rose-600 p-1 rounded transition-colors"
+                                    className="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors"
                                     title="Delete Container"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
@@ -922,26 +829,26 @@ export const TransporterDetails = ({
                         </tbody>
                       </table>
 
-                      {/* Vehicle Subtotal Footer */}
-                      <div className="bg-slate-100/80 border-t border-slate-200 px-3.5 py-2 flex items-center justify-between text-xs font-semibold">
-                        <span className="text-slate-600 uppercase tracking-wider text-[10px]">
+                      {/* Vehicle Subtotal Footer Bar */}
+                      <div className="bg-slate-100/80 border-t border-slate-200 px-3 py-1.5 flex items-center justify-between text-[11px] font-semibold">
+                        <span className="text-slate-500 uppercase tracking-wider text-[9px]">
                           Vehicle Total ({vehicle.containers.length} Container{vehicle.containers.length > 1 ? "s" : ""})
                         </span>
-                        <div className="flex items-center space-x-5 text-slate-800 text-xs">
+                        <div className="flex items-center space-x-4 text-slate-800">
                           <span>
                             Vendor:{" "}
-                            <strong className="text-slate-900">
-                              ₹ {totals.vendorCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            <strong className="text-slate-900 font-bold">
+                              ₹{totals.vendorCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                             </strong>
                           </span>
                           <span>
                             Addnl:{" "}
-                            <strong className="text-slate-900">
-                              ₹ {totals.additionalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            <strong className="text-slate-900 font-bold">
+                              ₹{totals.additionalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                             </strong>
                           </span>
-                          <span className="bg-blue-600 text-white px-2 py-0.5 rounded font-bold">
-                            ₹ {totals.totalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                          <span className="bg-blue-600 text-white px-2 py-0.5 rounded font-bold text-[11px]">
+                            ₹{totals.totalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                           </span>
                         </div>
                       </div>
@@ -955,85 +862,72 @@ export const TransporterDetails = ({
       </div>
 
       {/* BOTTOM SUMMARY & ACTIONS */}
-      <div className="p-5 border-t border-slate-200 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 border-t border-slate-200 bg-gradient-to-r from-blue-50/40 to-indigo-50/40">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               Summary
             </div>
-            <div className="text-xs font-medium text-slate-700 mt-0.5 space-x-2">
+            <div className="text-xs font-semibold text-slate-700 mt-0.5 space-x-2">
               <span>Request ID: <strong className="text-slate-900">{transportRequestId || "N/A"}</strong></span>
-              <span>•</span>
+              <span className="text-slate-300">•</span>
               <span>Total Vehicles: <strong className="text-blue-600">{nestedVehicles.length}</strong></span>
-              <span>•</span>
+              <span className="text-slate-300">•</span>
               <span>Total Containers: <strong className="text-blue-600">{totalContainersCount}</strong></span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-6">
-            <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400 text-right">
+          <div className="flex items-center space-x-4 flex-wrap gap-y-2">
+            <div className="text-right">
+              <div className="text-[9px] uppercase font-bold text-slate-400">
                 Total Vendor Charges
               </div>
-              <div className="text-sm font-bold text-blue-600 text-right">
-                ₹ {grandVendorCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              <div className="text-xs font-bold text-blue-600">
+                ₹{grandVendorCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
             </div>
 
-            <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400 text-right">
+            <div className="text-right">
+              <div className="text-[9px] uppercase font-bold text-slate-400">
                 Total Additional Charges
               </div>
-              <div className="text-sm font-bold text-blue-600 text-right">
-                ₹ {grandAdditionalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              <div className="text-xs font-bold text-blue-600">
+                ₹{grandAdditionalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
             </div>
 
-            <div className="bg-blue-600 text-white px-5 py-2 rounded-xl shadow-xs text-right">
-              <div className="text-[10px] font-semibold uppercase text-blue-100">
+            <div className="bg-blue-600 text-white px-4 py-1.5 rounded-lg shadow-xs text-right">
+              <div className="text-[9px] font-semibold uppercase text-blue-100">
                 Grand Total Amount
               </div>
-              <div className="text-lg font-black tracking-tight">
-                ₹ {grandTotalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              <div className="text-base font-black tracking-tight">
+                ₹{grandTotalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-3 mt-4 pt-4 border-t border-slate-200/80">
-          {onBack && (
             <button
               type="button"
-              onClick={onBack}
-              className="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors"
+              onClick={handleSaveAll}
+              disabled={isSubmitting}
+              className={`px-4 py-2 rounded-lg text-white font-semibold text-xs transition-all shadow-xs flex items-center space-x-1.5 ${
+                isSubmitting
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 active:scale-95"
+              }`}
             >
-              Cancel
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white mr-1.5" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Save All Transporter Details</span>
+                </>
+              )}
             </button>
-          )}
-
-          <button
-            type="button"
-            onClick={handleSaveAll}
-            disabled={isSubmitting}
-            className={`px-6 py-2.5 rounded-lg text-white font-semibold text-xs transition-all shadow-sm flex items-center space-x-2 ${
-              isSubmitting
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 active:scale-95 shadow-blue-500/20"
-            }`}
-          >
-            {isSubmitting ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2" />
-                <span>Saving Details...</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-1.5" />
-                <span>Save All Transporter Details</span>
-              </>
-            )}
-          </button>
+          </div>
         </div>
       </div>
 
