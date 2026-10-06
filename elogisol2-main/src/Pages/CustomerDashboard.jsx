@@ -25,7 +25,6 @@ import { useNavigate } from "react-router-dom";
 import StatsCards from "../Components/dashboard/StatCards";
 import { TransporterDetails } from "./Transporterdetails";
 import { transportRequestAPI } from "../utils/Api"; // Import the provided API
-import EnterpriseTripWorkflow from "../Components/dashboard/EnterpriseTripWorkflow";
 
 export default function CustomerDashboard({
   collapsed,
@@ -528,8 +527,287 @@ export default function CustomerDashboard({
           </div>
         </div>
       </header>
-      <main className="flex-1 overflow-auto bg-slate-50/60">
-        <EnterpriseTripWorkflow user={user} />
+      <main className="flex-1 overflow-auto bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Welcome back, {user?.name || "Customer"}! Request services and
+              manage your shipments
+            </p>
+          </div>
+          <StatsCards />
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3 bg-white rounded-lg shadow">
+              <ServiceRequestForm
+                requestData={requestData}
+                setRequestData={setRequestData}
+                handleSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                handleCancelEdit={handleCancelEdit}
+              />
+              <TransporterDetails
+                transportRequestId={requestData.id}
+                numberOfVehicles={
+                  requestData.no_of_vehicles ||
+                  requestData.total_containers ||
+                  27
+                }
+                transporterData={transporterData}
+                setTransporterData={setTransporterData}
+                isEditMode={Boolean(requestData.id)}
+                selectedServices={requestData.service_type}
+                vehicleType={requestData.vehicle_type}
+              />
+            </div>
+            <div className="lg:col-span-1 bg-white rounded-lg shadow h-fit">
+              <div className="px-4 py-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900">
+                  Recent Requests
+                </h3>
+                <div className="mt-2 space-y-2">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={requestId}
+                      onChange={(e) => setRequestId(e.target.value)}
+                      placeholder="Search by Request ID"
+                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={shipaNo}
+                      onChange={(e) => setShipaNo(e.target.value)}
+                      placeholder="Search by SHIPA No"
+                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={containerNo}
+                      onChange={(e) => setContainerNo(e.target.value)}
+                      placeholder="Search by Container No"
+                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={consigner}
+                      onChange={(e) => setConsigner(e.target.value)}
+                      placeholder="Search by Consigner"
+                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleSearch}
+                      className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      disabled={loading}
+                    >
+                      <Search className="h-5 w-5 mr-2" />
+                      {loading ? "Searching..." : "Search"}
+                    </button>
+                    <button
+                      onClick={refreshData}
+                      className="p-2 text-gray-600 hover:text-gray-800"
+                      title="Refresh"
+                    >
+                      <RefreshCw className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pastRequests.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <p className="text-sm">
+                          {isFiltered
+                            ? "No requests found matching your criteria"
+                            : "No requests found"}
+                        </p>
+                      </div>
+                    ) : (
+                      pastRequests.map((request) => (
+                        <div
+                          key={request.id}
+                          onClick={() => handleRequestClick(request)}
+                          className={`border rounded-lg p-3 transition-all duration-200 ${
+                            canEditRequest(request.status)
+                              ? "cursor-pointer hover:border-blue-300 hover:shadow-sm"
+                              : "cursor-not-allowed opacity-60"
+                          }`}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                Booking #{request.id}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(
+                                  request.created_at
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-1 ml-2">
+                              {getStatusBadge(request.status)}
+                              {request.status === "approved" && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDownloadInvoice(request);
+                                  }}
+                                  className="text-green-600 hover:text-green-800 p-1 rounded"
+                                  title="Download Invoice"
+                                >
+                                  <Download className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-500">Vehicle:</span>
+                              <span className="text-gray-900 font-medium">
+                                {request.vehicle_type}
+                              </span>
+                            </div>
+                            <div className="text-xs">
+                              <span className="text-gray-500">Services:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {(() => {
+                                  try {
+                                    const services = JSON.parse(
+                                      request.service_type || "[]"
+                                    );
+                                    const serviceArray = Array.isArray(services)
+                                      ? services
+                                      : [String(services)];
+                                    return serviceArray
+                                      .slice(0, 2)
+                                      .map((service, idx) => (
+                                        <span
+                                          key={idx}
+                                          className="inline-block px-1.5 py-0.5 rounded text-xs bg-blue-50 text-blue-700"
+                                        >
+                                          {service}
+                                        </span>
+                                      ));
+                                  } catch (error) {
+                                    return (
+                                      <span className="inline-block px-1.5 py-0.5 rounded text-xs bg-gray-50 text-gray-700">
+                                        N/A
+                                      </span>
+                                    );
+                                  }
+                                })()}
+                              </div>
+                            </div>
+                            {request.containerDetails &&
+                              request.containerDetails.length > 0 && (
+                                <div className="mt-2 text-xs">
+                                  <span className="text-gray-500">
+                                    Containers:
+                                  </span>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {request.containerDetails.map(
+                                      (container) => (
+                                        <div
+                                          key={container.id}
+                                          className="inline-block px-2 py-1 rounded text-xs bg-gray-50 border border-gray-200 text-gray-700"
+                                        >
+                                          {container.container_no}
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            {(!request.containerDetails ||
+                              request.containerDetails.length === 0) && (
+                              <div className="mt-2 text-xs">
+                                <span className="text-gray-500">
+                                  Containers:
+                                </span>
+                                <div className="flex gap-2 mt-1">
+                                  <span className="text-gray-600 bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                                    No containers assigned
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          {request.admin_comment && (
+                            <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                              <p className="text-gray-600 font-medium">
+                                Admin:
+                              </p>
+                              <p className="text-gray-700 truncate">
+                                {request.admin_comment}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+                {totalPages > 1 && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Page {currentPage} of {totalPages}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1 || loading}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      <button
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        disabled={currentPage === totalPages || loading}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

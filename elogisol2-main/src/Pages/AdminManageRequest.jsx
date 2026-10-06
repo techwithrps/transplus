@@ -33,7 +33,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { TransporterDetails } from "./Transporterdetails";
 import ServiceRequestForm from "../Components/dashboard/Servicerequest";
-import EnterpriseTripWorkflow from "../Components/dashboard/EnterpriseTripWorkflow";
 
 // Utility functions
 const parseJSON = (data, defaultValue) => {
@@ -694,8 +693,233 @@ const AdminManageRequest = ({
           </div>
         </div>
       </header>
-      <main className="flex-1 overflow-auto bg-slate-50/60">
-        <EnterpriseTripWorkflow user={user} />
+
+      <main className="flex-1 overflow-auto bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Admin Dashboard
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Manage all requests and reports
+              </p>
+            </div>
+            <button
+              onClick={() => setSelectedRequest(initializeNewRequest())}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Create New Trip
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left: Form and Transporter Details */}
+            <div className="lg:col-span-3">
+              {selectedRequest ? (
+                <>
+                  <ServiceRequestForm
+                    requestData={selectedRequest}
+                    setRequestData={setSelectedRequest}
+                    handleSubmit={handleEditSubmit}
+                    isSubmitting={isSubmitting}
+                    handleCancelEdit={handleCancelEdit}
+                    isCreateMode={!selectedRequest.id}
+                  />
+                  <TransporterDetails
+                    transportRequestId={selectedRequest.id || null}
+                    numberOfVehicles={selectedRequest.no_of_vehicles}
+                    transporterData={transporterData}
+                    setTransporterData={setTransporterData}
+                    isEditMode={!!selectedRequest.id}
+                    selectedServices={selectedRequest.service_type}
+                    vehicleType={selectedRequest.vehicle_type}
+                  />
+                </>
+              ) : (
+                <div className="bg-white p-6 rounded-lg shadow text-center text-gray-500">
+                  Select a request from the list to edit or create a new trip
+                </div>
+              )}
+            </div>
+
+            {/* Right: Request List */}
+            <div className="lg:col-span-1 bg-white rounded-lg shadow h-fit">
+              <div className="px-4 py-3 border-b border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900">
+                  All Requests
+                </h3>
+                <div className="mt-2 space-y-2">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={requestId}
+                      onChange={(e) => setRequestId(e.target.value)}
+                      placeholder="Search by Request ID"
+                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  <div class="relative">
+                    <input
+                      type="text"
+                      value={shipaNo}
+                      onChange={(e) => setShipaNo(e.target.value)}
+                      placeholder="Search by SHIPA No"
+                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <Search class="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  <div class="relative">
+                    <input
+                      type="text"
+                      value={containerNo}
+                      onChange={(e) => setContainerNo(e.target.value)}
+                      placeholder="Search by Container No"
+                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                      <Search class="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleSearch}
+                      className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      disabled={isLoading}
+                    >
+                      <Search className="h-5 w-5 mr-2" />
+                      {isLoading ? "Searching..." : "Search"}
+                    </button>
+                    <button
+                      onClick={refreshData}
+                      className="p-2 text-gray-600 hover:text-gray-800"
+                      title="Refresh"
+                    >
+                      <RefreshCw className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4">
+                {isLoading && reports.length === 0 ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : reports.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <p className="text-sm">
+                      {isFiltered
+                        ? "No requests found matching your criteria"
+                        : "No requests found"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {reports.map((report) => (
+                      <div
+                        key={report.id}
+                        onClick={() => handleReportClick(report)}
+                        className={`border rounded-lg p-3 transition-all duration-200 ${
+                          report.customer_id === user.id
+                            ? "cursor-not-allowed opacity-60"
+                            : "cursor-pointer hover:border-blue-300 hover:shadow-sm"
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              Booking #{report.id} - {report.customer_name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {formatDate(report.created_at)}
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <StatusBadge status={report.status} />
+                            {report.status === "approved" && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownloadInvoice(report);
+                                }}
+                                className="text-green-600 hover:text-green-800 p-1 rounded"
+                                title="Download Invoice"
+                              >
+                                <Download className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        <div className="space-y-1 text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Vehicle:</span>
+                            <span className="font-medium">
+                              {report.vehicle_type}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Charges:</span>
+                            <span className="font-medium">
+                              {formatCurrency(report.service_charges)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Profit/Loss:</span>
+                            <span className="font-medium flex items-center">
+                              {formatCurrency(report.profit_loss)}
+                              <ProfitLossIndicator
+                                profitLoss={report.profit_loss}
+                              />
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {totalPages > 1 && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Page {currentPage} of {totalPages}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1 || isLoading}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      <button
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        disabled={currentPage === totalPages || isLoading}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* Detail Modal */}
