@@ -269,23 +269,24 @@ const ContainerDetailsPage = () => {
         if (!response.success) {
           throw new Error(response.message || "Failed to delete container");
         }
+        toast.success("Container deleted successfully");
       } catch (error) {
         console.error("Error deleting container:", error);
         toast.error(error.message || "Failed to delete container");
         setIsLoading(false);
         return;
+      } finally {
+        setIsLoading(false);
       }
+    } else {
+      toast.success("Container removed");
     }
 
     const updatedContainers = containers.filter(
       (c) => (c.id || c.clientId) !== identifier
     );
     setContainers(updatedContainers);
-    toast.success("Container deleted successfully");
-    
-    // Reload data to reflect backend changes
-    await reloadDataAfterUpdate();
-    setIsLoading(false);
+    sessionStorage.setItem("containerData", JSON.stringify(updatedContainers));
   };
 
   // Update container data using its unique ID (clientId or id)
