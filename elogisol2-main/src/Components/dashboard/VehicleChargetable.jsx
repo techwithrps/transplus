@@ -66,34 +66,41 @@ const VehicleChargesTable = ({
   const uniqueVehicleDataList = getUniqueVehicles(vehicleDataList);
 
   const handleServiceChargeChange = (index, serviceName, value) => {
-    // Find the original index in vehicleDataList for this unique vehicle
-    const originalIndex = vehicleDataList.findIndex(
-      (v) => v.vehicleIndex === uniqueVehicleDataList[index].vehicleIndex
-    );
+    const targetVehicle = uniqueVehicleDataList[index];
+    if (!targetVehicle) return;
 
-    const vehicle = vehicleDataList[originalIndex];
-    const updatedCharges = {
-      ...vehicle.serviceCharges,
-      [serviceName]: value,
-    };
+    const targetVehicleNumber = targetVehicle.vehicleNumber?.trim().toUpperCase();
 
-    updateVehicleData(originalIndex, "serviceCharges", updatedCharges);
+    vehicleDataList.forEach((v, vIdx) => {
+      const isMatch = targetVehicleNumber
+        ? (v.vehicleNumber || "").trim().toUpperCase() === targetVehicleNumber
+        : v.vehicleIndex === targetVehicle.vehicleIndex;
 
-    const serviceTotal = Object.values(updatedCharges).reduce(
-      (sum, val) => sum + (parseFloat(val) || 0),
-      0
-    );
-
-    updateVehicleData(originalIndex, "totalCharge", serviceTotal);
+      if (isMatch) {
+        const updatedCharges = {
+          ...(v.serviceCharges || {}),
+          [serviceName]: value,
+        };
+        updateVehicleData(vIdx, "serviceCharges", updatedCharges);
+      }
+    });
   };
 
   const handleAdditionalChargeChange = (index, value) => {
-    // Find the original index in vehicleDataList for this unique vehicle
-    const originalIndex = vehicleDataList.findIndex(
-      (v) => v.vehicleIndex === uniqueVehicleDataList[index].vehicleIndex
-    );
+    const targetVehicle = uniqueVehicleDataList[index];
+    if (!targetVehicle) return;
 
-    updateVehicleData(originalIndex, "additionalCharges", value);
+    const targetVehicleNumber = targetVehicle.vehicleNumber?.trim().toUpperCase();
+
+    vehicleDataList.forEach((v, vIdx) => {
+      const isMatch = targetVehicleNumber
+        ? (v.vehicleNumber || "").trim().toUpperCase() === targetVehicleNumber
+        : v.vehicleIndex === targetVehicle.vehicleIndex;
+
+      if (isMatch) {
+        updateVehicleData(vIdx, "additionalCharges", value);
+      }
+    });
   };
 
   return (
@@ -176,13 +183,18 @@ const VehicleChargesTable = ({
                   <input
                     type="text"
                     className="w-full min-w-[140px] h-9 border border-gray-300 rounded-md px-2.5 py-1.5 text-sm bg-gray-50 cursor-not-allowed font-semibold text-gray-900"
-                    value={`₹${(vehicle.totalCharge || 0).toLocaleString(
-                      "en-IN",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }
-                    )}`}
+                    value={`₹${(
+                      (Object.values(vehicle.serviceCharges || {}).reduce(
+                        (s, val) => s + (parseFloat(val) || 0),
+                        0
+                      ) +
+                        (parseFloat(vehicle.additionalCharges) || 0) +
+                        (parseFloat(vehicle.baseCharge) || 0)) ||
+                      (parseFloat(vehicle.totalCharge) || 0)
+                    ).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`}
                     readOnly
                   />
                 </td>

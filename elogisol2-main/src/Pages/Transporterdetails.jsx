@@ -530,30 +530,43 @@ export const TransporterDetails = ({
     }
   };
 
-  const totalAmount = (() => {
-    const uniqueVehicleCharges = new Map();
+  const uniqueVehiclesForCharges = useMemo(() => {
+    const seenVehicleNumbers = new Set();
+    const unique = [];
 
     vehicleDataList.forEach((vehicle) => {
-      const vehicleId = vehicle.vehicleNumber.trim();
-      const charge = parseFloat(vehicle.totalCharge) || 0;
+      const vehicleNumber = vehicle.vehicleNumber?.trim().toUpperCase();
 
-      if (vehicleId) {
-        uniqueVehicleCharges.set(vehicleId, charge);
-      } else {
-        // For vehicles without a number, they are unique by their position in the list.
-        // We can use a unique key for the map.
-        uniqueVehicleCharges.set(
-          `_new_vehicle_${vehicle.vehicleIndex}`,
-          charge
-        );
+      if (!vehicleNumber) {
+        unique.push(vehicle);
+        return;
       }
+
+      if (seenVehicleNumbers.has(vehicleNumber)) {
+        return;
+      }
+
+      seenVehicleNumbers.add(vehicleNumber);
+      unique.push(vehicle);
     });
 
-    return Array.from(uniqueVehicleCharges.values()).reduce(
-      (sum, charge) => sum + charge,
-      0
-    );
-  })();
+    return unique.length > 0 ? unique : vehicleDataList;
+  }, [vehicleDataList]);
+
+  const totalAmount = useMemo(() => {
+    return uniqueVehiclesForCharges.reduce((sum, vehicle) => {
+      const serviceSum = Object.values(vehicle.serviceCharges || {}).reduce(
+        (s, val) => s + (parseFloat(val) || 0),
+        0
+      );
+      const additional = parseFloat(vehicle.additionalCharges) || 0;
+      const base = parseFloat(vehicle.baseCharge) || 0;
+      const calculated = serviceSum + additional + base;
+      const rowTotal =
+        calculated > 0 ? calculated : parseFloat(vehicle.totalCharge) || 0;
+      return sum + rowTotal;
+    }, 0);
+  }, [uniqueVehiclesForCharges]);
 
   if (isLoading) {
     return (
@@ -571,12 +584,16 @@ export const TransporterDetails = ({
     );
   }
 
-  const uniqueVehiclesCount = new Set(
-    vehicleDataList.map((v) => v.vehicleNumber?.trim().toUpperCase()).filter(Boolean)
-  ).size || vehicleDataList.length;
+  const uniqueVehiclesCount =
+    new Set(
+      vehicleDataList
+        .map((v) => v.vehicleNumber?.trim().toUpperCase())
+        .filter(Boolean)
+    ).size || vehicleDataList.length;
 
   const totalContainersCount =
-    vehicleDataList.filter((v) => v.containerNo?.trim()).length || vehicleDataList.length;
+    vehicleDataList.filter((v) => v.containerNo?.trim()).length ||
+    vehicleDataList.length;
 
   return (
     <div className="bg-white rounded-xl shadow-xs border border-gray-200 mt-3.5 overflow-hidden">
@@ -626,28 +643,44 @@ export const TransporterDetails = ({
             services={services}
             updateVehicleData={updateVehicleData}
           />
-          <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 p-4.5 rounded-xl border border-blue-200 shadow-xs">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
-              <div>
-                <div className="text-base font-semibold text-gray-900 mb-1">
+          <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-blue-50/90 p-4.5 sm:p-5 rounded-xl border border-blue-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-gray-900">
                   Summary
+                </span>
+                {transportRequestId && (
+                  <span className="text-xs bg-blue-100 text-blue-800 font-bold px-2.5 py-0.5 rounded-full border border-blue-200">
+                    ID: {transportRequestId}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+                <div>
+                  Physical Vehicles:{" "}
+                  <strong className="text-blue-700 font-bold">
+                    {uniqueVehiclesCount}
+                  </strong>
                 </div>
-                <div className="space-y-1 text-sm text-gray-600">
-                  <div>Request ID: <span className="font-semibold text-gray-800">{transportRequestId}</span></div>
-                  <div>
-                    Physical Vehicles: <strong className="text-blue-600 font-semibold">{uniqueVehiclesCount}</strong> | Assigned Containers: <strong className="text-blue-600 font-semibold">{totalContainersCount}</strong>
-                  </div>
+                <span className="text-gray-300">•</span>
+                <div>
+                  Assigned Containers:{" "}
+                  <strong className="text-blue-700 font-bold">
+                    {totalContainersCount}
+                  </strong>
                 </div>
               </div>
-              <div className="md:text-right">
-                <div className="text-2xl font-bold text-blue-700">
-                  ₹
-                  {totalAmount.toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </div>
-                <div className="text-xs text-gray-500 font-medium mt-0.5">Total Amount</div>
+            </div>
+            <div className="flex flex-col items-start md:items-end justify-center bg-white/85 backdrop-blur-xs px-5 py-2.5 rounded-lg border border-blue-100 shadow-2xs">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">
+                Total Amount
+              </div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-blue-700 tracking-tight">
+                ₹
+                {totalAmount.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </div>
             </div>
           </div>
