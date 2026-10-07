@@ -212,29 +212,31 @@ const StatsCards = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3.5">
       {statCards.map((card, index) => {
         const Icon = card.icon;
         return (
           <Link
             to={card.route}
             key={index}
-            className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200 cursor-pointer block"
+            className="bg-white p-3 sm:p-3.5 rounded-xl shadow-xs hover:shadow-md transition-shadow duration-200 cursor-pointer block border border-gray-100"
             style={{ textDecoration: "none" }}
           >
             <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 mb-1">
+              <div className="flex-1 min-w-0 mr-2">
+                <p className="text-xs font-medium text-gray-500 truncate mb-0.5">
                   {card.title}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                <p className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+                  {card.value}
+                </p>
               </div>
-              <div className={`p-3 rounded-lg ${card.bgColor}`}>
-                <Icon className={`h-6 w-6 ${card.iconColor}`} />
+              <div className={`p-2 rounded-lg ${card.bgColor} flex-shrink-0`}>
+                <Icon className={`h-4 w-4 ${card.iconColor}`} />
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs text-gray-500">{card.change}</p>
+            <div className="mt-2">
+              <p className="text-[11px] text-gray-400 truncate">{card.change}</p>
             </div>
           </Link>
         );

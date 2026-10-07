@@ -150,21 +150,21 @@ const ServiceRequestForm = ({
   }, []);
 
   return (
-    <div className="lg:col-span-2 bg-white rounded-lg shadow">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900">
+    <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-200">
+        <h3 className="text-base font-semibold text-gray-900">
           {safeRequestData.id ? "Edit Trip Request" : "Create New Trip"}
         </h3>
         {safeRequestData.id && (
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-xs text-gray-500 mt-0.5">
             Request ID: {safeRequestData.id}
           </p>
         )}
       </div>
-      <div className="p-6">
+      <div className="p-4 sm:p-5">
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 bg-white p-6 rounded-lg shadow request-form"
+          className="space-y-4 request-form"
         >
           {/* Vehicle Details Section */}
           <VehicleDetailsSection
@@ -197,17 +197,17 @@ const ServiceRequestForm = ({
           />
 
           {/* Form Buttons */}
-          <div className="flex space-x-4">
+          <div className="flex space-x-3 pt-2">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`flex-1 ${
+              className={`flex-1 h-9 ${
                 isSubmitting ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-              } text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center`}
+              } text-white text-xs font-semibold px-4 rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-xs`}
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
                   {loadingButtonText}
                 </>
               ) : (
@@ -219,7 +219,7 @@ const ServiceRequestForm = ({
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                className="h-9 px-4 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancel Edit
               </button>

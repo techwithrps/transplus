@@ -527,18 +527,19 @@ export default function CustomerDashboard({
           </div>
         </div>
       </header>
-      <main className="flex-1 overflow-auto bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Welcome back, {user?.name || "Customer"}! Request services and
-              manage your shipments
-            </p>
+      <main className="flex-1 overflow-auto bg-gray-50 p-3 sm:p-4">
+        <div className="w-full space-y-3.5">
+          <div className="mb-1 flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
+              <p className="text-xs text-gray-500">
+                Welcome back, {user?.name || "Customer"}! Request services and manage your shipments
+              </p>
+            </div>
           </div>
           <StatsCards />
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-3 bg-white rounded-lg shadow">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-3.5">
+            <div className="xl:col-span-3 space-y-3.5">
               <ServiceRequestForm
                 requestData={requestData}
                 setRequestData={setRequestData}
@@ -560,89 +561,91 @@ export default function CustomerDashboard({
                 vehicleType={requestData.vehicle_type}
               />
             </div>
-            <div className="lg:col-span-1 bg-white rounded-lg shadow h-fit">
-              <div className="px-4 py-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-900">
+            <div className="xl:col-span-1 bg-white rounded-xl shadow-xs border border-gray-200 h-fit">
+              <div className="px-3.5 py-2.5 border-b border-gray-200">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-700">
                   Recent Requests
                 </h3>
-                <div className="mt-2 space-y-2">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={requestId}
-                      onChange={(e) => setRequestId(e.target.value)}
-                      placeholder="Search by Request ID"
-                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <Search className="h-4 w-4 text-gray-400" />
+                <div className="mt-2 space-y-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-1.5">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={requestId}
+                        onChange={(e) => setRequestId(e.target.value)}
+                        placeholder="Request ID"
+                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={shipaNo}
+                        onChange={(e) => setShipaNo(e.target.value)}
+                        placeholder="SHIPA No"
+                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={containerNo}
+                        onChange={(e) => setContainerNo(e.target.value)}
+                        placeholder="Container No"
+                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={consigner}
+                        onChange={(e) => setConsigner(e.target.value)}
+                        placeholder="Consigner"
+                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      </div>
                     </div>
                   </div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={shipaNo}
-                      onChange={(e) => setShipaNo(e.target.value)}
-                      placeholder="Search by SHIPA No"
-                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <Search className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={containerNo}
-                      onChange={(e) => setContainerNo(e.target.value)}
-                      placeholder="Search by Container No"
-                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <Search className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={consigner}
-                      onChange={(e) => setConsigner(e.target.value)}
-                      placeholder="Search by Consigner"
-                      className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <Search className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-1.5 pt-0.5">
                     <button
                       onClick={handleSearch}
-                      className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 h-8 flex items-center justify-center px-3 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
                       disabled={loading}
                     >
-                      <Search className="h-5 w-5 mr-2" />
+                      <Search className="h-3.5 w-3.5 mr-1.5" />
                       {loading ? "Searching..." : "Search"}
                     </button>
                     <button
                       onClick={refreshData}
-                      className="p-2 text-gray-600 hover:text-gray-800"
+                      className="h-8 w-8 flex items-center justify-center text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
                       title="Refresh"
                     >
-                      <RefreshCw className="h-5 w-5" />
+                      <RefreshCw className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
               </div>
-              <div className="p-4">
+              <div className="p-2.5">
                 {loading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <div className="flex items-center justify-center py-6">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 max-h-[calc(100vh-320px)] overflow-y-auto pr-0.5 scrollbar-thin">
                     {pastRequests.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
-                        <p className="text-sm">
+                      <div className="text-center py-6 text-gray-400">
+                        <p className="text-xs">
                           {isFiltered
                             ? "No requests found matching your criteria"
                             : "No requests found"}

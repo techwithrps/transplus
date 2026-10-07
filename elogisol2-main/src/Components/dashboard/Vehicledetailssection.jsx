@@ -50,9 +50,9 @@ const VehicleDetailsSection = ({
   return (
     <>
       {/* SHIPA NO and Vehicle Type - First Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <div>
-          <label htmlFor="shipa_no" className="block text-sm font-medium mb-2">
+          <label htmlFor="shipa_no" className="block text-xs font-semibold text-gray-700 mb-1">
             SIPA NO
           </label>
           <CustomerSearchInput
@@ -69,10 +69,10 @@ const VehicleDetailsSection = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Vehicle Type</label>
+          <label className="block text-xs font-semibold text-gray-700 mb-1">Vehicle Type</label>
           <select
             name="vehicle_type"
-            className="w-full border rounded-md p-2"
+            className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             value={safeRequestData.vehicle_type}
             onChange={(e) => {
               const newVehicleType = e.target.value;
@@ -126,10 +126,10 @@ const VehicleDetailsSection = ({
 
       {/* Vehicle Size - Second Row (conditional based on vehicle type) */}
       {safeRequestData.vehicle_type && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {safeRequestData.vehicle_type === "Trailer" && (
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Trailer Size
               </label>
               <input
@@ -147,7 +147,7 @@ const VehicleDetailsSection = ({
                     vehicle_size: e.target.value,
                   }))
                 }
-                className="w-full border rounded-md p-2"
+                className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter trailer size"
                 required
               />
@@ -156,7 +156,7 @@ const VehicleDetailsSection = ({
 
           {safeRequestData.vehicle_type === "Truck" && (
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Truck Size
               </label>
               <input
@@ -174,7 +174,7 @@ const VehicleDetailsSection = ({
                     vehicle_size: e.target.value,
                   }))
                 }
-                className="w-full border rounded-md p-2"
+                className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter truck size"
                 required
               />
@@ -182,25 +182,25 @@ const VehicleDetailsSection = ({
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
               Vehicle Status
             </label>
             {shouldForceLoadedStatus(safeRequestData.vehicle_type) ? (
               <div>
                 <input
                   type="text"
-                  className="w-full border rounded-md p-2 bg-gray-100"
+                  className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-gray-100 text-gray-600"
                   value="Loaded"
                   disabled
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-[11px] text-gray-500 mt-0.5">
                   This vehicle type is always loaded
                 </p>
               </div>
             ) : (
               <select
                 name="vehicle_status"
-                className="w-full border rounded-md p-2"
+                className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 value={safeRequestData.vehicle_status}
                 onChange={(e) =>
                   setRequestData((prev) => ({
@@ -233,20 +233,20 @@ const VehicleDetailsSection = ({
 
       {/* Container Details - Third Section (only for Trailer) */}
       {shouldShowContainerDetails(safeRequestData.vehicle_type) && (
-        <div className="space-y-4">
-          <label className="block text-sm font-medium mb-2">
+        <div className="space-y-2.5">
+          <label className="block text-xs font-semibold text-gray-700">
             Container Details
           </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 border rounded-lg">
-              <div className="space-y-2">
-                <label className="text-sm font-medium block">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50/50">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-700 block">
                   20' Containers
                 </label>
                 <input
                   type="number"
                   min="0"
-                  className="w-full border rounded-md p-2"
+                  className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter number of 20ft containers"
                   value={safeRequestData.containers_20ft || ""}
                   onChange={(e) => {
@@ -265,15 +265,15 @@ const VehicleDetailsSection = ({
             </div>
 
             {shouldShow40ftOption(safeRequestData.vehicle_type) && (
-              <div className="p-4 border rounded-lg">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium block">
+              <div className="p-3 border border-gray-200 rounded-lg bg-gray-50/50">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700 block">
                     40' Containers
                   </label>
                   <input
                     type="number"
                     min="0"
-                    className="w-full border rounded-md p-2"
+                    className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter number of 40ft containers"
                     value={safeRequestData.containers_40ft || ""}
                     onChange={(e) => {
@@ -293,11 +293,11 @@ const VehicleDetailsSection = ({
             )}
           </div>
 
-          <div className="mt-2 text-sm text-gray-600">
-            Total Containers: {safeRequestData.total_containers || 0}
+          <div className="text-xs text-gray-600">
+            Total Containers: <span className="font-semibold text-gray-800">{safeRequestData.total_containers || 0}</span>
             {(safeRequestData.containers_20ft > 0 ||
               safeRequestData.containers_40ft > 0) && (
-              <span className="ml-2">
+              <span className="ml-1.5 text-blue-600 font-medium">
                 (
                 {safeRequestData.containers_20ft > 0
                   ? `${safeRequestData.containers_20ft} × 20ft`

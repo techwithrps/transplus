@@ -98,30 +98,30 @@ const VehicleChargesTable = ({
 
   return (
     <div>
-      <h4 className="text-lg font-medium text-gray-900 mb-4">
+      <h4 className="text-sm font-semibold text-gray-900 mb-2">
         Vehicle Charges
       </h4>
 
-      <div className="overflow-x-auto border rounded-lg">
+      <div className="overflow-x-auto border border-gray-200 rounded-lg">
         <table className="w-full table-auto divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider w-32">
                 Vehicle Number
               </th>
 
               {services.map((serviceName) => (
                 <th
                   key={serviceName}
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px]"
+                  className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[130px]"
                 >
                   Vendor Charges (INR)
                 </th>
               ))}
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[160px]">
+              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
                 Additional Charges (INR)
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[160px]">
+              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
                 Total Charge (INR)
               </th>
             </tr>
@@ -133,18 +133,18 @@ const VehicleChargesTable = ({
                 key={`charges-${vehicle.vehicleIndex || index}`}
                 className="hover:bg-gray-50"
               >
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold">
+                <td className="px-2.5 py-2 whitespace-nowrap text-xs font-medium text-gray-900 text-center">
+                  <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-semibold">
                     {vehicle.vehicleNumber ||
                       `Vehicle ${vehicle.vehicleIndex || index + 1}`}
                   </span>
                 </td>
 
                 {services.map((serviceName) => (
-                  <td key={serviceName} className="px-4 py-4 whitespace-nowrap">
+                  <td key={serviceName} className="px-2.5 py-2 whitespace-nowrap">
                     <input
                       type="number"
-                      className="min-w-[140px] border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full min-w-[120px] h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       value={vehicle.serviceCharges?.[serviceName] || ""}
                       onChange={(e) =>
                         handleServiceChargeChange(
@@ -159,10 +159,10 @@ const VehicleChargesTable = ({
                     />
                   </td>
                 ))}
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td className="px-2.5 py-2 whitespace-nowrap">
                   <input
                     type="number"
-                    className="min-w-[140px] border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-w-[120px] h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     value={vehicle.additionalCharges || ""}
                     onChange={(e) =>
                       handleAdditionalChargeChange(index, e.target.value)
@@ -172,10 +172,10 @@ const VehicleChargesTable = ({
                     step="0.01"
                   />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td className="px-2.5 py-2 whitespace-nowrap">
                   <input
                     type="text"
-                    className="min-w-[160px] border border-gray-300 rounded-md p-2 text-sm bg-gray-50 cursor-not-allowed font-medium text-gray-900"
+                    className="w-full min-w-[140px] h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-gray-50 cursor-not-allowed font-semibold text-gray-900"
                     value={`₹${(vehicle.totalCharge || 0).toLocaleString(
                       "en-IN",
                       {

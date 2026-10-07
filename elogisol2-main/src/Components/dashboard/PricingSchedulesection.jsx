@@ -72,20 +72,20 @@ const PricingScheduleSection = ({
 
       {/* Total Charge Display */}
       {safeRequestData.service_type.length > 0 && (
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <div className="space-y-2">
-            <h4 className="font-medium text-gray-900">Pricing Summary</h4>
-            <div className="space-y-1 text-sm">
+        <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-200/80">
+          <div className="space-y-1.5">
+            <h4 className="font-semibold text-xs text-gray-900">Pricing Summary</h4>
+            <div className="space-y-1 text-xs">
               {Object.entries(safeRequestData.service_prices).map(
                 ([service, price]) => (
-                  <div key={service} className="flex justify-between">
+                  <div key={service} className="flex justify-between text-gray-600">
                     <span>{service}:</span>
-                    <span>₹{parseFloat(price) || 0}</span>
+                    <span className="font-medium text-gray-900">₹{parseFloat(price) || 0}</span>
                   </div>
                 )
               )}
-              <div className="border-t pt-2 mt-2">
-                <div className="flex justify-between font-bold text-lg">
+              <div className="border-t border-blue-200/80 pt-1.5 mt-1.5">
+                <div className="flex justify-between font-bold text-sm text-blue-900">
                   <span>Total Charge:</span>
                   <span>₹{totalCharge.toFixed(2)}</span>
                 </div>
@@ -95,16 +95,16 @@ const PricingScheduleSection = ({
         </div>
       )}
 
-      {/* Dates and Times - UPDATED: Removed min restrictions to allow previous dates */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Dates and Times */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label className="block text-xs font-semibold text-gray-700 mb-1">
             Expected Pickup Date
           </label>
           <input
             type="date"
             name="expected_pickup_date"
-            className="w-full border rounded-md p-2"
+            className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             value={safeRequestData.expected_pickup_date || today}
             onChange={(e) =>
               setRequestData((prev) => ({
@@ -112,17 +112,16 @@ const PricingScheduleSection = ({
                 expected_pickup_date: e.target.value,
               }))
             }
-            // Removed min={today} to allow previous dates
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label className="block text-xs font-semibold text-gray-700 mb-1">
             Expected Delivery Date
           </label>
           <input
             type="date"
-            className="w-full border rounded-md p-2"
+            className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             value={safeRequestData.expected_delivery_date || today}
             onChange={(e) =>
               setRequestData({
@@ -130,7 +129,6 @@ const PricingScheduleSection = ({
                 expected_delivery_date: e.target.value,
               })
             }
-            // Removed min={safeRequestData.expected_pickup_date || today} to allow previous dates
             required
           />
         </div>

@@ -114,7 +114,7 @@ const LocationSearchInput = ({
     <div ref={wrapperRef} className="relative">
       <input
         type="text"
-        className="w-full border rounded-md p-2"
+        className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         value={inputValue}
         onChange={handleInputChange}
         onBlur={handleInputConfirm} // ✅ confirm on blur
