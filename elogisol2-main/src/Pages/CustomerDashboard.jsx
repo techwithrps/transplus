@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Download,
   RefreshCw,
+  Plus,
 } from "lucide-react";
 import api, { transporterAPI } from "../utils/Api";
 import { toast, ToastContainer } from "react-toastify";
@@ -354,6 +355,13 @@ export default function CustomerDashboard({
   const handleCancelEdit = () => {
     sessionStorage.removeItem("activeCustomerRequest");
     sessionStorage.removeItem("transportRequestId");
+    sessionStorage.removeItem("vehicleData");
+    sessionStorage.removeItem("containerData");
+
+    const now = new Date();
+    const today = now.toISOString().split("T")[0];
+    const currentTime = now.toTimeString().slice(0, 5);
+
     setRequestData({
       id: null,
       SHIPA_NO: "",
@@ -364,7 +372,7 @@ export default function CustomerDashboard({
       vehicle_status: "Empty",
       containers_20ft: 0,
       containers_40ft: 0,
-      no_of_vehicles: "",
+      no_of_vehicles: "1",
       total_containers: 0,
       pickup_location: "",
       stuffing_location: "",
@@ -374,14 +382,26 @@ export default function CustomerDashboard({
       cargo_weight: "",
       service_type: [],
       service_prices: {},
-      expected_pickup_date: "",
-      expected_pickup_time: "",
-      expected_delivery_date: "",
-      expected_delivery_time: "",
+      expected_pickup_date: today,
+      expected_pickup_time: currentTime,
+      expected_delivery_date: today,
+      expected_delivery_time: currentTime,
       requested_price: "",
       status: "Pending",
       admin_comment: "",
     });
+
+    setTransporterData({
+      transporterName: "",
+      vehicleNumber: "",
+      driverName: "",
+      driverContact: "",
+      vendorName: "",
+      vendorContact: "",
+    });
+
+    toast.info("Form reset! You can now create a new trip request.");
+    document.querySelector(".request-form")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const canEditRequest = (status) => status.toLowerCase() !== "completed";
@@ -567,13 +587,21 @@ export default function CustomerDashboard({
       </header>
       <main className="flex-1 overflow-auto bg-gray-50 p-4 sm:p-5">
         <div className="w-full space-y-4">
-          <div className="mb-2 flex items-center justify-between">
+          <div className="mb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
               <p className="text-sm text-gray-500 mt-0.5">
                 Welcome back, {user?.name || "Customer"}! Request services and manage your shipments
               </p>
             </div>
+            <button
+              type="button"
+              onClick={handleCancelEdit}
+              className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer shadow-xs self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              + New Trip Request
+            </button>
           </div>
           <StatsCards />
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
@@ -587,6 +615,7 @@ export default function CustomerDashboard({
               />
               <TransporterDetails
                 transportRequestId={requestData.id}
+                onBack={handleCancelEdit}
                 numberOfVehicles={
                   requestData.no_of_vehicles ||
                   requestData.total_containers ||
