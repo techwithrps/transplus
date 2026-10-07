@@ -168,7 +168,7 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
         <input
           ref={inputRef}
           type="text"
-          className="w-full h-8.5 min-w-[160px] border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full h-9 min-w-[160px] border border-gray-300 rounded-md px-2.5 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -571,7 +571,7 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
         <input
           ref={inputRef}
           type="text"
-          className="w-full h-8.5 min-w-[140px] border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full h-9 min-w-[140px] border border-gray-300 rounded-md px-2.5 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -840,9 +840,9 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-gray-900 mb-2">
+      <h4 className="text-base font-bold text-gray-900 mb-2">
         Vehicle & Driver Information
-        <span className="text-sm font-normal text-gray-500 ml-2">
+        <span className="text-xs font-normal text-gray-500 ml-2">
           (All fields marked with * are required)
         </span>
       </h4>
@@ -851,19 +851,19 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider w-20">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-20">
                 Vehicle #
               </th>
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[180px]">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[180px]">
                 Vendor Name *
               </th>
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[140px]">
                 Vehicle Number *
               </th>
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[140px]">
                 Assigner Name *
               </th>
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[160px]">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[160px]">
                 Driver Contact *
               </th>
             </tr>
@@ -902,7 +902,7 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
                           validationErrors[`${originalIndex}-vehicleNumber`]
                             ? "border-red-500"
                             : "border-gray-300"
-                        } rounded-md px-2.5 py-1 h-8.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                        } rounded-md px-2.5 py-1.5 h-9 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                         value={vehicle.vehicleNumber}
                         onChange={(e) =>
                           handleInputChange(
@@ -946,7 +946,7 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
                           validationErrors[`${originalIndex}-driverContact`]
                             ? "border-red-500"
                             : "border-gray-300"
-                        } rounded-md px-2.5 py-1 h-8.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                        } rounded-md px-2.5 py-1.5 h-9 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                         value={vehicle.driverContact}
                         onChange={(e) =>
                           handleInputChange(

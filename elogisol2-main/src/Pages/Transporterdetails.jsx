@@ -580,9 +580,9 @@ export const TransporterDetails = ({
 
   return (
     <div className="bg-white rounded-xl shadow-xs border border-gray-200 mt-3.5 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+      <div className="px-5 py-3.5 border-b border-gray-200 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-semibold text-gray-900">
+          <h3 className="text-lg font-bold text-gray-900">
             Transporter Details
           </h3>
           {transportRequestId && (
@@ -591,11 +591,11 @@ export const TransporterDetails = ({
             </p>
           )}
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2.5">
           <button
             type="button"
             onClick={addVehicle}
-            className="px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer shadow-xs"
+            className="px-3.5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer shadow-xs"
           >
             + Add Vehicle
           </button>
@@ -603,7 +603,7 @@ export const TransporterDetails = ({
             type="button"
             onClick={removeVehicle}
             disabled={vehicleCount <= 1}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors cursor-pointer ${
+            className={`px-3.5 py-2 rounded-lg text-sm font-semibold text-white transition-colors cursor-pointer ${
               vehicleCount <= 1
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-red-600 hover:bg-red-700 shadow-xs"
@@ -614,8 +614,8 @@ export const TransporterDetails = ({
         </div>
       </div>
 
-      <div className="p-4 sm:p-5">
-        <form onSubmit={handleOpenModal} className="space-y-4">
+      <div className="p-5 sm:p-6">
+        <form onSubmit={handleOpenModal} className="space-y-4.5">
           <VehicleBasicDetailsTable
             vehicleDataList={vehicleDataList}
             updateVehicleData={updateVehicleData}
@@ -626,13 +626,13 @@ export const TransporterDetails = ({
             services={services}
             updateVehicleData={updateVehicleData}
           />
-          <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 p-4 rounded-xl border border-blue-200 shadow-xs">
+          <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 p-4.5 rounded-xl border border-blue-200 shadow-xs">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
               <div>
-                <div className="text-sm font-semibold text-gray-900 mb-1">
+                <div className="text-base font-semibold text-gray-900 mb-1">
                   Summary
                 </div>
-                <div className="space-y-0.5 text-xs text-gray-600">
+                <div className="space-y-1 text-sm text-gray-600">
                   <div>Request ID: <span className="font-semibold text-gray-800">{transportRequestId}</span></div>
                   <div>
                     Physical Vehicles: <strong className="text-blue-600 font-semibold">{uniqueVehiclesCount}</strong> | Assigned Containers: <strong className="text-blue-600 font-semibold">{totalContainersCount}</strong>
@@ -647,7 +647,7 @@ export const TransporterDetails = ({
                     maximumFractionDigits: 2,
                   })}
                 </div>
-                <div className="text-[11px] text-gray-500 font-medium">Total Amount</div>
+                <div className="text-xs text-gray-500 font-medium mt-0.5">Total Amount</div>
               </div>
             </div>
           </div>
@@ -655,7 +655,7 @@ export const TransporterDetails = ({
             <button
               type="button"
               onClick={onBack}
-              className="h-9 px-5 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              className="h-10 px-5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -663,7 +663,7 @@ export const TransporterDetails = ({
               type="submit"
               disabled={isSubmitting}
               className={`
-                h-9 px-6 rounded-lg text-white text-xs font-semibold transition-all cursor-pointer shadow-xs
+                h-10 px-6 rounded-lg text-white text-sm font-semibold transition-all cursor-pointer shadow-xs
                 ${
                   isSubmitting
                     ? "bg-blue-400 cursor-not-allowed"

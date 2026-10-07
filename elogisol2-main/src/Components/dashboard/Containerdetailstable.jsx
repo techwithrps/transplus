@@ -56,7 +56,7 @@ const ContainerDetailsTable = ({ vehicleDataList, updateVehicleData, transportRe
           <button
             type="button"
             onClick={handleViewContainerDetails}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 flex items-center"
+            className="px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 flex items-center shadow-xs cursor-pointer"
           >
             <svg
               className="w-4 h-4 mr-2"
@@ -85,7 +85,7 @@ const ContainerDetailsTable = ({ vehicleDataList, updateVehicleData, transportRe
           <button
             type="button"
             onClick={handleViewVinDetails}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 flex items-center"
+            className="px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 flex items-center shadow-xs cursor-pointer"
           >
             <svg
               className="w-4 h-4 mr-2"

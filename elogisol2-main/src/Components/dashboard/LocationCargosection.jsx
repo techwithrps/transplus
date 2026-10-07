@@ -38,9 +38,9 @@ const LocationsCargoSection = ({
   return (
     <>
       {/* Consignee and Consigner Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Consignee</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Consignee</label>
           <CustomerSearchInput
             value={safeRequestData.consignee}
             onChange={(value) =>
@@ -50,7 +50,7 @@ const LocationsCargoSection = ({
           />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Consigner</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Consigner</label>
           <CustomerSearchInput
             value={safeRequestData.consigner}
             onChange={(value) =>
@@ -62,22 +62,22 @@ const LocationsCargoSection = ({
       </div>
 
       {/* Map Selection Checkbox */}
-      <div className="my-1">
-        <label className="bg-blue-50/80 hover:bg-blue-50 py-1 px-2.5 rounded-md border border-blue-200 inline-flex items-center text-xs font-medium text-blue-800 cursor-pointer transition-colors">
+      <div className="my-1.5">
+        <label className="bg-blue-50/80 hover:bg-blue-50 py-1.5 px-3 rounded-md border border-blue-200 inline-flex items-center text-sm font-medium text-blue-800 cursor-pointer transition-colors">
           <input
             type="checkbox"
             checked={useOpenStreetMap}
             onChange={handleCheckboxChange}
-            className="mr-1.5 h-3.5 w-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+            className="mr-2 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
           />
           Use Google Map
         </label>
       </div>
 
       {/* Locations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
             Pickup Location
           </label>
           <LocationSearchInput
@@ -94,7 +94,7 @@ const LocationsCargoSection = ({
         </div>
         {currentVehicleStatus === "Loaded" && (
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Stuffing Location
             </label>
             <LocationSearchInput
@@ -111,7 +111,7 @@ const LocationsCargoSection = ({
           </div>
         )}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
             Delivery Location
           </label>
           <LocationSearchInput
@@ -130,27 +130,27 @@ const LocationsCargoSection = ({
 
       {/* Cargo Details (only when Loaded) */}
       {currentVehicleStatus === "Loaded" && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Commodity/Cargo
             </label>
             {shouldLockCommodityToVIN(safeRequestData.vehicle_type) ? (
               <div>
                 <input
                   type="text"
-                  className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-gray-100 text-gray-600"
+                  className="w-full h-10 border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600"
                   value="VIN"
                   disabled
                 />
-                <p className="text-[11px] text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 mt-1">
                   This trip type automatically uses VIN as commodity
                 </p>
               </div>
             ) : (
               <input
                 type="text"
-                className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-10 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 value={safeRequestData.commodity}
                 onChange={(e) =>
                   setRequestData({
@@ -163,9 +163,9 @@ const LocationsCargoSection = ({
             )}
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Cargo Type</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Cargo Type</label>
             <select
-              className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full h-10 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               value={safeRequestData.cargo_type}
               onChange={(e) =>
                 setRequestData({
@@ -183,18 +183,18 @@ const LocationsCargoSection = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Total Weight (KG)
             </label>
             {shouldLockCommodityToVIN(safeRequestData.vehicle_type) ? (
               <div>
                 <input
                   type="number"
-                  className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-gray-100 text-gray-600"
+                  className="w-full h-10 border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 text-gray-600"
                   value={0}
                   disabled
                 />
-                <p className="text-[11px] text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 mt-1">
                   Weight is automatically set to 0 for this trip type
                 </p>
               </div>
@@ -202,7 +202,7 @@ const LocationsCargoSection = ({
               <input
                 type="number"
                 name="cargo_weight"
-                className="w-full h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-10 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 value={safeRequestData.cargo_weight}
                 onChange={(e) =>
                   setRequestData((prev) => ({

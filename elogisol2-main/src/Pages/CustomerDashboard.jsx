@@ -527,19 +527,19 @@ export default function CustomerDashboard({
           </div>
         </div>
       </header>
-      <main className="flex-1 overflow-auto bg-gray-50 p-3 sm:p-4">
-        <div className="w-full space-y-3.5">
-          <div className="mb-1 flex items-center justify-between">
+      <main className="flex-1 overflow-auto bg-gray-50 p-4 sm:p-5">
+        <div className="w-full space-y-4">
+          <div className="mb-2 flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
-              <p className="text-xs text-gray-500">
+              <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+              <p className="text-sm text-gray-500 mt-0.5">
                 Welcome back, {user?.name || "Customer"}! Request services and manage your shipments
               </p>
             </div>
           </div>
           <StatsCards />
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-3.5">
-            <div className="xl:col-span-3 space-y-3.5">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+            <div className="xl:col-span-3 space-y-4">
               <ServiceRequestForm
                 requestData={requestData}
                 setRequestData={setRequestData}
@@ -562,22 +562,22 @@ export default function CustomerDashboard({
               />
             </div>
             <div className="xl:col-span-1 bg-white rounded-xl shadow-xs border border-gray-200 h-fit">
-              <div className="px-3.5 py-2.5 border-b border-gray-200">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+              <div className="px-4 py-3 border-b border-gray-200">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700">
                   Recent Requests
                 </h3>
-                <div className="mt-2 space-y-1.5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-1.5">
+                <div className="mt-2.5 space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
                     <div className="relative">
                       <input
                         type="text"
                         value={requestId}
                         onChange={(e) => setRequestId(e.target.value)}
                         placeholder="Request ID"
-                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
+                        <Search className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
                     <div className="relative">
@@ -586,10 +586,10 @@ export default function CustomerDashboard({
                         value={shipaNo}
                         onChange={(e) => setShipaNo(e.target.value)}
                         placeholder="SHIPA No"
-                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
+                        <Search className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
                     <div className="relative">
@@ -598,10 +598,10 @@ export default function CustomerDashboard({
                         value={containerNo}
                         onChange={(e) => setContainerNo(e.target.value)}
                         placeholder="Container No"
-                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
+                        <Search className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
                     <div className="relative">
@@ -610,28 +610,28 @@ export default function CustomerDashboard({
                         value={consigner}
                         onChange={(e) => setConsigner(e.target.value)}
                         placeholder="Consigner"
-                        className="block w-full h-8 rounded-md border-gray-300 pl-2.5 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <Search className="h-3.5 w-3.5 text-gray-400" />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
+                        <Search className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
                   </div>
-                  <div className="flex space-x-1.5 pt-0.5">
+                  <div className="flex space-x-2 pt-1">
                     <button
                       onClick={handleSearch}
-                      className="flex-1 h-8 flex items-center justify-center px-3 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                      className="flex-1 h-9 flex items-center justify-center px-3 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition-colors cursor-pointer shadow-xs"
                       disabled={loading}
                     >
-                      <Search className="h-3.5 w-3.5 mr-1.5" />
+                      <Search className="h-4 w-4 mr-1.5" />
                       {loading ? "Searching..." : "Search"}
                     </button>
                     <button
                       onClick={refreshData}
-                      className="h-8 w-8 flex items-center justify-center text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
+                      className="h-9 w-9 flex items-center justify-center text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer transition-colors"
                       title="Refresh"
                     >
-                      <RefreshCw className="h-3.5 w-3.5" />
+                      <RefreshCw className="h-4 w-4" />
                     </button>
                   </div>
                 </div>

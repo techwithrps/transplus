@@ -59,9 +59,9 @@ const ServicesSelection = ({
   };
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-3">
       <div className="flex justify-between items-center mb-1">
-        <label className="block text-xs font-semibold text-gray-700">
+        <label className="block text-sm font-semibold text-gray-700">
           Services Required with Selling Price
         </label>
       </div>
@@ -71,11 +71,11 @@ const ServicesSelection = ({
           <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {services.map((service) => (
             <div
               key={service.SERVICE_ID}
-              className={`border rounded-lg p-2.5 transition-all ${
+              className={`border rounded-lg p-3 transition-all ${
                 selectedServices.includes(service.SERVICE_NAME)
                   ? "bg-blue-50/70 border-blue-500 shadow-xs"
                   : "border-gray-200 hover:border-gray-300 bg-white"
@@ -89,12 +89,12 @@ const ServicesSelection = ({
                   <div className="flex items-center">
                     <input
                       type="checkbox"
-                      className="h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       checked={selectedServices.includes(service.SERVICE_NAME)}
                       onChange={() => {}}
                       onClick={(e) => e.stopPropagation()}
                     />
-                    <span className="ml-2 text-xs font-semibold text-gray-900">
+                    <span className="ml-2.5 text-sm font-semibold text-gray-900">
                       {service.SERVICE_NAME}
                     </span>
                   </div>
@@ -102,12 +102,12 @@ const ServicesSelection = ({
               </div>
 
               {selectedServices.includes(service.SERVICE_NAME) && (
-                <div className="mt-2 pt-2 border-t border-blue-200/60">
-                  <label className="block text-[11px] font-medium text-gray-600 mb-0.5">
+                <div className="mt-2.5 pt-2.5 border-t border-blue-200/60">
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
                     Selling Price (₹)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs font-semibold">
+                    <span className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-semibold">
                       ₹
                     </span>
                     <input
@@ -115,7 +115,7 @@ const ServicesSelection = ({
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full h-8 pl-6 pr-2.5 border border-gray-300 rounded-md text-xs bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full h-9 pl-7 pr-3 border border-gray-300 rounded-md text-sm bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       value={servicePrices[service.SERVICE_NAME] || ""}
                       onChange={(e) =>
                         handlePriceChange(service.SERVICE_NAME, e.target.value)

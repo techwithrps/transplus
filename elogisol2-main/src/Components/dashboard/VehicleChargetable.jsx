@@ -98,7 +98,7 @@ const VehicleChargesTable = ({
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-gray-900 mb-2">
+      <h4 className="text-base font-bold text-gray-900 mb-2">
         Vehicle Charges
       </h4>
 
@@ -106,22 +106,22 @@ const VehicleChargesTable = ({
         <table className="w-full table-auto divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider w-32">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-36">
                 Vehicle Number
               </th>
 
               {services.map((serviceName) => (
                 <th
                   key={serviceName}
-                  className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[130px]"
+                  className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[140px]"
                 >
                   Vendor Charges (INR)
                 </th>
               ))}
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[140px]">
                 Additional Charges (INR)
               </th>
-              <th className="px-2.5 py-2 text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
+              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[140px]">
                 Total Charge (INR)
               </th>
             </tr>
@@ -133,8 +133,8 @@ const VehicleChargesTable = ({
                 key={`charges-${vehicle.vehicleIndex || index}`}
                 className="hover:bg-gray-50"
               >
-                <td className="px-2.5 py-2 whitespace-nowrap text-xs font-medium text-gray-900 text-center">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-semibold">
+                <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
+                  <span className="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full text-xs font-semibold">
                     {vehicle.vehicleNumber ||
                       `Vehicle ${vehicle.vehicleIndex || index + 1}`}
                   </span>
@@ -144,7 +144,7 @@ const VehicleChargesTable = ({
                   <td key={serviceName} className="px-2.5 py-2 whitespace-nowrap">
                     <input
                       type="number"
-                      className="w-full min-w-[120px] h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full min-w-[120px] h-9 border border-gray-300 rounded-md px-2.5 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       value={vehicle.serviceCharges?.[serviceName] || ""}
                       onChange={(e) =>
                         handleServiceChargeChange(
@@ -162,7 +162,7 @@ const VehicleChargesTable = ({
                 <td className="px-2.5 py-2 whitespace-nowrap">
                   <input
                     type="number"
-                    className="w-full min-w-[120px] h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-w-[120px] h-9 border border-gray-300 rounded-md px-2.5 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     value={vehicle.additionalCharges || ""}
                     onChange={(e) =>
                       handleAdditionalChargeChange(index, e.target.value)
@@ -175,7 +175,7 @@ const VehicleChargesTable = ({
                 <td className="px-2.5 py-2 whitespace-nowrap">
                   <input
                     type="text"
-                    className="w-full min-w-[140px] h-8.5 border border-gray-300 rounded-md px-2.5 py-1 text-xs bg-gray-50 cursor-not-allowed font-semibold text-gray-900"
+                    className="w-full min-w-[140px] h-9 border border-gray-300 rounded-md px-2.5 py-1.5 text-sm bg-gray-50 cursor-not-allowed font-semibold text-gray-900"
                     value={`₹${(vehicle.totalCharge || 0).toLocaleString(
                       "en-IN",
                       {

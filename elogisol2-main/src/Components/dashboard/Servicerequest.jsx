@@ -151,8 +151,8 @@ const ServiceRequestForm = ({
 
   return (
     <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200">
-        <h3 className="text-base font-semibold text-gray-900">
+      <div className="px-5 py-3.5 border-b border-gray-200">
+        <h3 className="text-lg font-bold text-gray-900">
           {safeRequestData.id ? "Edit Trip Request" : "Create New Trip"}
         </h3>
         {safeRequestData.id && (
@@ -161,10 +161,10 @@ const ServiceRequestForm = ({
           </p>
         )}
       </div>
-      <div className="p-4 sm:p-5">
+      <div className="p-5 sm:p-6">
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 request-form"
+          className="space-y-4.5 request-form"
         >
           {/* Vehicle Details Section */}
           <VehicleDetailsSection
@@ -197,13 +197,13 @@ const ServiceRequestForm = ({
           />
 
           {/* Form Buttons */}
-          <div className="flex space-x-3 pt-2">
+          <div className="flex space-x-3 pt-3">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`flex-1 h-9 ${
+              className={`flex-1 h-10 ${
                 isSubmitting ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-              } text-white text-xs font-semibold px-4 rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-xs`}
+              } text-white text-sm font-semibold px-5 rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-xs`}
             >
               {isSubmitting ? (
                 <>
@@ -219,7 +219,7 @@ const ServiceRequestForm = ({
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="h-9 px-4 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="h-10 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancel Edit
               </button>
