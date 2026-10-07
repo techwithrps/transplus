@@ -151,25 +151,14 @@ const ServiceRequestForm = ({
 
   return (
     <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-gray-200 flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-bold text-gray-900">
-            {safeRequestData.id ? "Edit Trip Request" : "Create New Trip"}
-          </h3>
-          {safeRequestData.id && (
-            <p className="text-xs text-gray-500 mt-0.5">
-              Request ID: {safeRequestData.id}
-            </p>
-          )}
-        </div>
+      <div className="px-5 py-3.5 border-b border-gray-200">
+        <h3 className="text-lg font-bold text-gray-900">
+          {safeRequestData.id ? "Edit Trip Request" : "Create New Trip"}
+        </h3>
         {safeRequestData.id && (
-          <button
-            type="button"
-            onClick={handleCancelEdit}
-            className="px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center shadow-2xs"
-          >
-            + Start New Trip
-          </button>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Request ID: {safeRequestData.id}
+          </p>
         )}
       </div>
       <div className="p-5 sm:p-6">
