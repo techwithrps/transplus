@@ -198,6 +198,19 @@ export const TransporterDetails = ({
   }, []);
 
   const updateVehicleData = (vehicleIndex, field, value) => {
+    if (field === "_insert_new_row") {
+      setVehicleDataList((prevList) => [...prevList, value]);
+      setVehicleCount((prev) => prev + 1);
+      return;
+    }
+    if (field === "_remove_row") {
+      setVehicleDataList((prevList) =>
+        prevList.filter((_, idx) => idx !== vehicleIndex)
+      );
+      setVehicleCount((prev) => Math.max(1, prev - 1));
+      return;
+    }
+
     setVehicleDataList((prevList) =>
       prevList.map((vehicle, index) => {
         if (index === vehicleIndex) {
@@ -547,7 +560,7 @@ export const TransporterDetails = ({
       <div className="bg-white rounded-lg shadow mt-6">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">
-            Transporter Details {vehicleCount > 1 ? "s" : ""}
+            Transporter Details
           </h3>
         </div>
         <div className="p-6 flex justify-center items-center">
@@ -558,12 +571,19 @@ export const TransporterDetails = ({
     );
   }
 
+  const uniqueVehiclesCount = new Set(
+    vehicleDataList.map((v) => v.vehicleNumber?.trim().toUpperCase()).filter(Boolean)
+  ).size || vehicleDataList.length;
+
+  const totalContainersCount =
+    vehicleDataList.filter((v) => v.containerNo?.trim()).length || vehicleDataList.length;
+
   return (
     <div className="bg-white rounded-lg shadow mt-6">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <div>
           <h3 className="text-lg font-medium text-gray-900">
-            Transporter Details {vehicleCount > 1 ? "s" : ""}
+            Transporter Details
           </h3>
           {transportRequestId && (
             <p className="text-sm text-gray-600 mt-1">
@@ -614,7 +634,9 @@ export const TransporterDetails = ({
                 </div>
                 <div className="space-y-1 text-sm text-gray-600">
                   <div>Request ID: {transportRequestId}</div>
-                  <div>Total Vehicles: {vehicleCount}</div>
+                  <div>
+                    Physical Vehicles: <strong className="text-blue-600 font-semibold">{uniqueVehiclesCount}</strong> | Assigned Containers: <strong className="text-blue-600 font-semibold">{totalContainersCount}</strong>
+                  </div>
                 </div>
               </div>
               <div className="text-right">
