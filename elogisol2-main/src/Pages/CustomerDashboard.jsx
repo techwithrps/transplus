@@ -600,7 +600,7 @@ export default function CustomerDashboard({
               className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer shadow-xs self-start sm:self-auto"
             >
               <Plus className="w-4 h-4 mr-1.5" />
-              + New Trip Request
+              New Trip Request
             </button>
           </div>
           <StatsCards />

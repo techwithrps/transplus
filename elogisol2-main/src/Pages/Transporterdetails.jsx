@@ -172,6 +172,11 @@ export const TransporterDetails = ({
   useEffect(() => {
     if (transportRequestId) {
       loadTransporterDetails();
+    } else {
+      setVehicleCount(1);
+      setVehicleDataList(initializeVehicleData(1));
+      setOriginalVehicleData([]);
+      sessionStorage.removeItem("vehicleData");
     }
   }, [transportRequestId, vehicleType]);
 
