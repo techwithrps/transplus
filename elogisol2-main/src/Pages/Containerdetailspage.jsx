@@ -422,6 +422,18 @@ const ContainerDetailsPage = () => {
     }));
   };
 
+  // Toggle all vehicles expanded / collapsed
+  const toggleAllVehicles = () => {
+    const allExpanded = Object.keys(groupedContainers).every(
+      (vNum) => expandedVehicles[vNum] !== false
+    );
+    const updated = {};
+    Object.keys(groupedContainers).forEach((vNum) => {
+      updated[vNum] = !allExpanded;
+    });
+    setExpandedVehicles(updated);
+  };
+
   // Validate container data with ISO 6346 check digit
   const calculateCheckDigit = (containerNo) => {
     const chars = containerNo.slice(0, 10).split("");
@@ -886,6 +898,18 @@ const ContainerDetailsPage = () => {
               Container Hierarchy ({containers.length} Container
               {containers.length !== 1 ? "s" : ""})
             </h2>
+            <button
+              type="button"
+              onClick={toggleAllVehicles}
+              className="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md border border-blue-200/80 transition-all cursor-pointer shadow-xs active:scale-95"
+            >
+              {Object.keys(groupedContainers).length > 0 &&
+              Object.keys(groupedContainers).every(
+                (vNum) => expandedVehicles[vNum] !== false
+              )
+                ? "Collapse All"
+                : "Expand All"}
+            </button>
           </div>
         </div>
 
@@ -900,25 +924,31 @@ const ContainerDetailsPage = () => {
                     return (
                       <div
                         key={vehicleNumber}
-                        className="border border-gray-200 rounded-xl overflow-hidden shadow-xs transition-shadow hover:shadow-sm"
+                        className={`border rounded-xl overflow-hidden shadow-xs transition-all duration-200 ${
+                          isExpanded
+                            ? "border-blue-200 shadow-sm"
+                            : "border-gray-200 hover:border-blue-300 hover:shadow-xs"
+                        }`}
                       >
                         {/* Parent Node: Vehicle Header */}
                         <div
-                          className={`px-4 py-2.5 flex justify-between items-center cursor-pointer select-none transition-colors ${
-                            isExpanded ? "bg-slate-50 border-b border-gray-200" : "bg-gray-50 hover:bg-gray-100"
+                          className={`group px-4 py-2.5 flex justify-between items-center cursor-pointer select-none transition-all duration-200 border-l-4 ${
+                            isExpanded
+                              ? "border-l-blue-600 bg-slate-50 border-b border-gray-200 hover:bg-slate-100/90"
+                              : "border-l-transparent bg-gray-50/90 hover:bg-blue-50/50 hover:border-l-blue-400"
                           }`}
                           onClick={() => toggleVehicleExpansion(vehicleNumber)}
                         >
                           <div className="flex items-center space-x-2.5">
-                            <span className="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                            <span className="bg-blue-600 group-hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs transition-colors">
                               Vehicle #{vehicleIdx + 1}
                             </span>
-                            <span className="font-semibold text-gray-900 text-sm">
+                            <span className="font-semibold text-gray-900 group-hover:text-blue-900 text-sm transition-colors">
                               {vehicleNumber === "unassigned"
                                 ? "Unassigned Containers"
                                 : vehicleNumber}
                             </span>
-                            <span className="bg-blue-100 text-blue-800 text-[11px] font-medium px-2 py-0.5 rounded-full">
+                            <span className="bg-blue-100 group-hover:bg-blue-200/80 text-blue-800 text-[11px] font-semibold px-2 py-0.5 rounded-full transition-colors">
                               {vehicleContainers.length} container{vehicleContainers.length !== 1 ? "s" : ""}
                             </span>
                           </div>
@@ -932,7 +962,7 @@ const ContainerDetailsPage = () => {
                                   vehicleNumber === "unassigned" ? "" : vehicleNumber
                                 );
                               }}
-                              className="inline-flex items-center px-2.5 py-1 border border-transparent rounded-md shadow-xs text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 cursor-pointer transition-colors"
+                              className="inline-flex items-center px-2.5 py-1 border border-transparent rounded-md shadow-xs text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 cursor-pointer transition-all"
                               title="Add container to this vehicle"
                             >
                               <svg
@@ -951,10 +981,10 @@ const ContainerDetailsPage = () => {
                               + Add Container
                             </button>
 
-                            <div className="p-0.5 rounded text-gray-400 hover:text-gray-600">
+                            <div className="p-1 rounded text-gray-400 group-hover:text-blue-600 transition-colors">
                               <svg
-                                className={`h-4 w-4 transform transition-transform duration-200 ${
-                                  isExpanded ? "rotate-180" : ""
+                                className={`h-4 w-4 transform transition-transform duration-300 ${
+                                  isExpanded ? "rotate-180" : "rotate-0"
                                 }`}
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -1016,7 +1046,7 @@ const ContainerDetailsPage = () => {
                                       return (
                                         <div
                                           key={container._uid}
-                                          className="border border-gray-200 rounded-lg p-2.5 px-3 bg-white shadow-xs relative hover:border-blue-300 transition-colors w-full"
+                                          className="border border-gray-200 rounded-lg p-2.5 px-3 bg-white shadow-xs relative hover:border-blue-400 hover:shadow-md transition-all duration-200 w-full"
                                         >
                                           {/* Compact Container Header */}
                                           <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-gray-100">
@@ -1037,7 +1067,7 @@ const ContainerDetailsPage = () => {
                                                 onClick={() =>
                                                   removeContainer(container._uid)
                                                 }
-                                                className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded focus:outline-none cursor-pointer transition-colors"
+                                                className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium text-red-700 bg-red-50 hover:bg-red-100 hover:text-red-800 border border-red-200 hover:border-red-300 rounded focus:outline-none cursor-pointer transition-all active:scale-95"
                                                 title="Remove Container"
                                               >
                                                 <svg
