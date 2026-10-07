@@ -251,7 +251,14 @@ const VinDetailsPage = () => {
   }, [vehicleType]);
 
   const onBack = () => {
-    navigate(-1);
+    const returnUrl =
+      location.state?.returnUrl || sessionStorage.getItem("containerReturnUrl");
+
+    if (returnUrl && returnUrl !== "/customer/vinpage") {
+      navigate(returnUrl);
+    } else {
+      navigate(-1);
+    }
   };
 
   const handleRefresh = async () => {

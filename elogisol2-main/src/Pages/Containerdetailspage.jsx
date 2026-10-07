@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
 import { transporterAPI } from "../utils/Api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import ResponseModal from "../Components/Responsemodal";
 
@@ -10,6 +10,7 @@ const generateUid = () =>
 
 const ContainerDetailsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [containers, setContainers] = useState([]);
@@ -312,7 +313,14 @@ const ContainerDetailsPage = () => {
   // Back Navigation
   const onBack = () => {
     sessionStorage.setItem("containerData", JSON.stringify(containers));
-    navigate(-1);
+    const returnUrl =
+      location.state?.returnUrl || sessionStorage.getItem("containerReturnUrl");
+
+    if (returnUrl && returnUrl !== "/customer/container-page") {
+      navigate(returnUrl);
+    } else {
+      navigate(-1);
+    }
   };
 
   // Add container to specific vehicle

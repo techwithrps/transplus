@@ -24,9 +24,11 @@ const ContainerDetailsTable = ({ vehicleDataList, updateVehicleData, transportRe
     // Store the current container data in sessionStorage to access it on the container details page
     sessionStorage.setItem("containerData", JSON.stringify(vehicleDataList));
     sessionStorage.setItem("transportRequestId", transportRequestId);
+    const returnPath = window.location.pathname + window.location.search;
+    sessionStorage.setItem("containerReturnUrl", returnPath);
     
     // Navigate to the container details page
-    navigate("/customer/container-page");
+    navigate("/customer/container-page", { state: { returnUrl: returnPath } });
   };
 
   const handleViewVinDetails = () => {
@@ -34,9 +36,11 @@ const ContainerDetailsTable = ({ vehicleDataList, updateVehicleData, transportRe
     sessionStorage.setItem("containerData", JSON.stringify(vehicleDataList));
     sessionStorage.setItem("transportRequestId", transportRequestId);
     sessionStorage.setItem("vehicleType", tripType); // Store the vehicle type instead of just the number
+    const returnPath = window.location.pathname + window.location.search;
+    sessionStorage.setItem("containerReturnUrl", returnPath);
     
     // Navigate to the container details page
-    navigate("/customer/vinpage");
+    navigate("/customer/vinpage", { state: { returnUrl: returnPath } });
   };
 
   return (
