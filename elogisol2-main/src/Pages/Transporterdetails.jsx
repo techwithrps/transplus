@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import { transporterAPI, transporterListAPI } from "../utils/Api";
 import VehicleBasicDetailsTable from "../Components/dashboard/Vehiclebasicdetailstable";
