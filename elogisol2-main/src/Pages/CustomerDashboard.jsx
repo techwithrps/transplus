@@ -162,6 +162,37 @@ export default function CustomerDashboard({
     fetchRequests(currentPage, isFiltered);
   }, [currentPage, isFiltered]);
 
+  // Restore active request if returning from Container/VIN page or reload
+  useEffect(() => {
+    try {
+      const savedRequest = sessionStorage.getItem("activeCustomerRequest");
+      if (savedRequest) {
+        const parsed = JSON.parse(savedRequest);
+        if (parsed && parsed.id) {
+          setRequestData(parsed);
+          return;
+        }
+      }
+
+      const storedId = sessionStorage.getItem("transportRequestId");
+      if (storedId && pastRequests.length > 0 && !requestData.id) {
+        const match = pastRequests.find((r) => String(r.id) === String(storedId));
+        if (match) {
+          handleRequestClick(match);
+        }
+      }
+    } catch (e) {
+      console.error("Error restoring active customer request:", e);
+    }
+  }, [pastRequests]);
+
+  // Sync active request to sessionStorage whenever requestData with an ID changes
+  useEffect(() => {
+    if (requestData && requestData.id) {
+      sessionStorage.setItem("activeCustomerRequest", JSON.stringify(requestData));
+    }
+  }, [requestData]);
+
   const handleSearch = () => {
     setCurrentPage(1);
     setIsFiltered(true);
@@ -189,6 +220,10 @@ export default function CustomerDashboard({
   };
 
   const handleLogout = () => {
+    sessionStorage.removeItem("activeCustomerRequest");
+    sessionStorage.removeItem("transportRequestId");
+    sessionStorage.removeItem("containerData");
+    sessionStorage.removeItem("containerReturnUrl");
     logout();
     navigate("/login");
   };
@@ -317,6 +352,8 @@ export default function CustomerDashboard({
   };
 
   const handleCancelEdit = () => {
+    sessionStorage.removeItem("activeCustomerRequest");
+    sessionStorage.removeItem("transportRequestId");
     setRequestData({
       id: null,
       SHIPA_NO: "",
@@ -386,6 +423,7 @@ export default function CustomerDashboard({
         status: request.status || "Pending",
         admin_comment: request.admin_comment || "",
       });
+      sessionStorage.setItem("transportRequestId", request.id);
       document
         .querySelector(".request-form")
         ?.scrollIntoView({ behavior: "smooth" });
