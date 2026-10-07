@@ -870,311 +870,105 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {uniqueVehicleDataList.map((vehicle, index) => {
-              // Find original index for this vehicle
+              // Find original index for validation errors
               const originalIndex = vehicleDataList.findIndex(
                 (v) => v.vehicleIndex === vehicle.vehicleIndex
               );
 
-              // Find all container rows associated with this physical vehicle
-              const vehicleNumberClean = vehicle.vehicleNumber?.trim().toUpperCase();
-              const associatedContainers = vehicleDataList
-                .map((v, vIdx) => ({ ...v, originalIndex: vIdx }))
-                .filter((v) => {
-                  if (vehicleNumberClean) {
-                    return v.vehicleNumber?.trim().toUpperCase() === vehicleNumberClean;
-                  }
-                  return v.vehicleIndex === vehicle.vehicleIndex;
-                });
-
               return (
-                <React.Fragment key={`vehicle-group-${vehicle.vehicleIndex || index}`}>
-                  {/* PARENT VEHICLE ROW */}
-                  <tr className="hover:bg-gray-50 bg-white">
-                    <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                      <div className="flex items-center justify-center space-x-1">
-                        <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-xs">
-                          {index + 1}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 whitespace-nowrap">
-                      <VendorSearchInput
-                        value={getVendorName(vehicle)}
-                        onChange={(value) => handleVendorChange(index, value)}
-                        placeholder="Search and select vendor"
-                      />
-                    </td>
-                    <td className="px-3 py-3 whitespace-nowrap">
-                      <div>
-                        <input
-                          type="text"
-                          className={`w-full min-w-[140px] border ${
-                            validationErrors[`${originalIndex}-vehicleNumber`]
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold text-gray-800`}
-                          value={vehicle.vehicleNumber}
-                          onChange={(e) => {
-                            const val = e.target.value.toUpperCase();
-                            handleInputChange(index, "vehicleNumber", val);
-                            // Also sync vehicleNumber to all associated container rows for this truck
-                            associatedContainers.forEach((c) => {
-                              if (c.originalIndex !== originalIndex) {
-                                updateVehicleData(c.originalIndex, "vehicleNumber", val);
-                              }
-                            });
-                          }}
-                          placeholder="e.g., MH01AB1234"
-                          pattern="[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}"
-                          title="Vehicle number format: MH01AB1234"
-                          required
-                        />
-                        {validationErrors[`${originalIndex}-vehicleNumber`] && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {validationErrors[`${originalIndex}-vehicleNumber`]}
-                          </p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 whitespace-nowrap">
-                      <DriverSearchInput
-                        value={vehicle.driverName}
-                        onChange={(value, driverData) =>
-                          handleDriverSelection(index, value, driverData)
+                <tr
+                  key={`vehicle-${vehicle.vehicleIndex || index}`}
+                  className="hover:bg-gray-50"
+                >
+                  <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
+                    <div className="flex items-center justify-center">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold">
+                        {index + 1}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4 whitespace-nowrap">
+                    <VendorSearchInput
+                      value={getVendorName(vehicle)}
+                      onChange={(value) => handleVendorChange(index, value)}
+                      placeholder="Search and select vendor"
+                    />
+                  </td>
+                  <td className="px-3 py-4 whitespace-nowrap">
+                    <div>
+                      <input
+                        type="text"
+                        className={`w-full min-w-[140px] border ${
+                          validationErrors[`${originalIndex}-vehicleNumber`]
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                        value={vehicle.vehicleNumber}
+                        onChange={(e) =>
+                          handleInputChange(
+                            index,
+                            "vehicleNumber",
+                            e.target.value.toUpperCase()
+                          )
                         }
-                        vendorName={getVendorName(vehicle)}
-                        placeholder="Select driver"
+                        placeholder="e.g., MH01AB1234"
+                        pattern="[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}"
+                        title="Vehicle number must be in format like MH01AB1234"
+                        required
                       />
-                      {validationErrors[`${originalIndex}-driverName`] && (
+                      {validationErrors[`${originalIndex}-vehicleNumber`] && (
                         <p className="text-red-500 text-xs mt-1">
-                          {validationErrors[`${originalIndex}-driverName`]}
+                          {validationErrors[`${originalIndex}-vehicleNumber`]}
                         </p>
                       )}
-                    </td>
-                    <td className="px-3 py-3 whitespace-nowrap">
-                      <div>
-                        <input
-                          type="tel"
-                          className={`w-full min-w-[160px] border ${
-                            validationErrors[`${originalIndex}-driverContact`]
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                          value={vehicle.driverContact}
-                          onChange={(e) =>
-                            handleInputChange(
-                              index,
-                              "driverContact",
-                              e.target.value.replace(/\D/g, "").slice(0, 10)
-                            )
-                          }
-                          placeholder="10-digit mobile number"
-                          pattern="\d{10}"
-                          maxLength="10"
-                          required
-                        />
-                        {validationErrors[`${originalIndex}-driverContact`] && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {validationErrors[`${originalIndex}-driverContact`]}
-                          </p>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* NESTED SUB-TREE ROW FOR CONTAINERS */}
-                  <tr className="bg-slate-50/60">
-                    <td colSpan="5" className="px-4 py-2 border-b border-gray-200">
-                      <div className="ml-4 pl-3 border-l-2 border-blue-400 py-1.5 space-y-2">
-                        <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
-                          <span className="flex items-center space-x-1.5">
-                            <span className="text-blue-600 font-bold">↳</span>
-                            <span>Assigned Containers ({associatedContainers.length})</span>
-                          </span>
-                          {associatedContainers.length === 1 && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                // Add twin container for this physical vehicle
-                                const newContainerRow = {
-                                  ...vehicle,
-                                  id: null,
-                                  vehicleIndex: vehicleDataList.length + 1,
-                                  containerNo: "",
-                                  containerSize: "20",
-                                  containerType: "DV",
-                                  line: vehicle.line || "",
-                                  seal1: "",
-                                  seal2: "",
-                                  containerTotalWeight: "",
-                                  cargoTotalWeight: "",
-                                };
-                                updateVehicleData(vehicleDataList.length, "_insert_new_row", newContainerRow);
-                              }}
-                              className="text-[11px] font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded transition-colors"
-                            >
-                              + Add Twin 20ft Container
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Containers List in Sub-Tree */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {associatedContainers.map((container, cIdx) => (
-                            <div
-                              key={`container-${container.originalIndex || cIdx}`}
-                              className="bg-white border border-slate-200 rounded-md p-2.5 shadow-2xs space-y-2"
-                            >
-                              <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
-                                <span className="text-xs font-bold text-slate-800 flex items-center space-x-1">
-                                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded text-[10px]">
-                                    Container #{cIdx + 1}
-                                  </span>
-                                  <span className="text-slate-500 font-normal">
-                                    on {vehicle.vehicleNumber || `Vehicle ${index + 1}`}
-                                  </span>
-                                </span>
-                                {associatedContainers.length > 1 && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      // Remove this twin container row
-                                      updateVehicleData(container.originalIndex, "_remove_row", null);
-                                    }}
-                                    className="text-[10px] text-red-500 hover:text-red-700 font-medium"
-                                  >
-                                    Remove
-                                  </button>
-                                )}
-                              </div>
-
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                                <div>
-                                  <label className="block text-[10px] font-medium text-gray-500 mb-0.5">
-                                    Container No *
-                                  </label>
-                                  <input
-                                    type="text"
-                                    className="w-full border border-gray-300 rounded p-1 text-xs uppercase font-mono font-semibold focus:ring-1 focus:ring-blue-500"
-                                    value={container.containerNo || ""}
-                                    onChange={(e) =>
-                                      updateVehicleData(
-                                        container.originalIndex,
-                                        "containerNo",
-                                        e.target.value.toUpperCase()
-                                      )
-                                    }
-                                    placeholder="e.g. MSDU1234567"
-                                    maxLength="11"
-                                  />
-                                </div>
-
-                                <div>
-                                  <label className="block text-[10px] font-medium text-gray-500 mb-0.5">
-                                    Size
-                                  </label>
-                                  <select
-                                    className="w-full border border-gray-300 rounded p-1 text-xs bg-white focus:ring-1 focus:ring-blue-500"
-                                    value={container.containerSize || "20"}
-                                    onChange={(e) =>
-                                      updateVehicleData(
-                                        container.originalIndex,
-                                        "containerSize",
-                                        e.target.value
-                                      )
-                                    }
-                                  >
-                                    <option value="20">20 ft</option>
-                                    <option value="40">40 ft</option>
-                                    <option value="45">45 ft</option>
-                                  </select>
-                                </div>
-
-                                <div>
-                                  <label className="block text-[10px] font-medium text-gray-500 mb-0.5">
-                                    Type
-                                  </label>
-                                  <select
-                                    className="w-full border border-gray-300 rounded p-1 text-xs bg-white focus:ring-1 focus:ring-blue-500"
-                                    value={container.containerType || "DV"}
-                                    onChange={(e) =>
-                                      updateVehicleData(
-                                        container.originalIndex,
-                                        "containerType",
-                                        e.target.value
-                                      )
-                                    }
-                                  >
-                                    <option value="DV">DV (Dry Van)</option>
-                                    <option value="HQ">HQ (High Cube)</option>
-                                    <option value="OT">OT (Open Top)</option>
-                                    <option value="FR">FR (Flat Rack)</option>
-                                    <option value="RF">RF (Reefer)</option>
-                                  </select>
-                                </div>
-
-                                <div>
-                                  <label className="block text-[10px] font-medium text-gray-500 mb-0.5">
-                                    Shipping Line
-                                  </label>
-                                  <input
-                                    type="text"
-                                    className="w-full border border-gray-300 rounded p-1 text-xs uppercase focus:ring-1 focus:ring-blue-500"
-                                    value={container.line || ""}
-                                    onChange={(e) =>
-                                      updateVehicleData(
-                                        container.originalIndex,
-                                        "line",
-                                        e.target.value.toUpperCase()
-                                      )
-                                    }
-                                    placeholder="Line (e.g. MAERSK)"
-                                  />
-                                </div>
-
-                                <div>
-                                  <label className="block text-[10px] font-medium text-gray-500 mb-0.5">
-                                    Seal No
-                                  </label>
-                                  <input
-                                    type="text"
-                                    className="w-full border border-gray-300 rounded p-1 text-xs uppercase focus:ring-1 focus:ring-blue-500"
-                                    value={container.seal1 || container.sealNo || ""}
-                                    onChange={(e) => {
-                                      updateVehicleData(container.originalIndex, "seal1", e.target.value.toUpperCase());
-                                      updateVehicleData(container.originalIndex, "sealNo", e.target.value.toUpperCase());
-                                    }}
-                                    placeholder="Seal 1"
-                                  />
-                                </div>
-
-                                <div>
-                                  <label className="block text-[10px] font-medium text-gray-500 mb-0.5">
-                                    Cargo Weight (MT)
-                                  </label>
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    className="w-full border border-gray-300 rounded p-1 text-xs focus:ring-1 focus:ring-blue-500"
-                                    value={container.cargoTotalWeight || ""}
-                                    onChange={(e) =>
-                                      updateVehicleData(
-                                        container.originalIndex,
-                                        "cargoTotalWeight",
-                                        e.target.value
-                                      )
-                                    }
-                                    placeholder="Weight"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </React.Fragment>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4 whitespace-nowrap">
+                    <DriverSearchInput
+                      value={vehicle.driverName}
+                      onChange={(value, driverData) =>
+                        handleDriverSelection(index, value, driverData)
+                      }
+                      vendorName={getVendorName(vehicle)}
+                      placeholder="Select driver"
+                    />
+                    {validationErrors[`${originalIndex}-driverName`] && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {validationErrors[`${originalIndex}-driverName`]}
+                      </p>
+                    )}
+                  </td>
+                  <td className="px-3 py-4 whitespace-nowrap">
+                    <div>
+                      <input
+                        type="tel"
+                        className={`w-full min-w-[160px] border ${
+                          validationErrors[`${originalIndex}-driverContact`]
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                        value={vehicle.driverContact}
+                        onChange={(e) =>
+                          handleInputChange(
+                            index,
+                            "driverContact",
+                            e.target.value.replace(/\D/g, "").slice(0, 10)
+                          )
+                        }
+                        placeholder="10-digit mobile number"
+                        pattern="\d{10}"
+                        title="Driver contact must be exactly 10 digits"
+                        maxLength="10"
+                        required
+                      />
+                      {validationErrors[`${originalIndex}-driverContact`] && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {validationErrors[`${originalIndex}-driverContact`]}
+                        </p>
+                      )}
+                    </div>
+                  </td>
+                </tr>
               );
             })}
           </tbody>
