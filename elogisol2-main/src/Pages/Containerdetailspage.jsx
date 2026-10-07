@@ -903,23 +903,22 @@ const ContainerDetailsPage = () => {
                       >
                         {/* Parent Node: Vehicle Header */}
                         <div
-                          className={`px-5 py-3.5 flex justify-between items-center cursor-pointer select-none transition-colors ${
+                          className={`px-4 py-2.5 flex justify-between items-center cursor-pointer select-none transition-colors ${
                             isExpanded ? "bg-slate-50 border-b border-gray-200" : "bg-gray-50 hover:bg-gray-100"
                           }`}
                           onClick={() => toggleVehicleExpansion(vehicleNumber)}
                         >
-                          <div className="flex items-center space-x-3">
-                            <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
+                          <div className="flex items-center space-x-2.5">
+                            <span className="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-xs">
                               Vehicle #{vehicleIdx + 1}
                             </span>
-                            <span className="font-semibold text-gray-900 text-base">
+                            <span className="font-semibold text-gray-900 text-sm">
                               {vehicleNumber === "unassigned"
                                 ? "Unassigned Containers"
                                 : vehicleNumber}
                             </span>
-                            <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                              {vehicleContainers.length} container
-                              {vehicleContainers.length !== 1 ? "s" : ""}
+                            <span className="bg-blue-100 text-blue-800 text-[11px] font-medium px-2 py-0.5 rounded-full">
+                              {vehicleContainers.length} container{vehicleContainers.length !== 1 ? "s" : ""}
                             </span>
                           </div>
 
@@ -932,11 +931,11 @@ const ContainerDetailsPage = () => {
                                   vehicleNumber === "unassigned" ? "" : vehicleNumber
                                 );
                               }}
-                              className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-lg shadow-xs text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer transition-colors"
+                              className="inline-flex items-center px-2.5 py-1 border border-transparent rounded-md shadow-xs text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 cursor-pointer transition-colors"
                               title="Add container to this vehicle"
                             >
                               <svg
-                                className="h-3.5 w-3.5 mr-1"
+                                className="h-3 w-3 mr-1"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -951,9 +950,9 @@ const ContainerDetailsPage = () => {
                               + Add Container
                             </button>
 
-                            <div className="p-1 rounded-md text-gray-400 hover:text-gray-600">
+                            <div className="p-0.5 rounded text-gray-400 hover:text-gray-600">
                               <svg
-                                className={`h-5 w-5 transform transition-transform duration-200 ${
+                                className={`h-4 w-4 transform transition-transform duration-200 ${
                                   isExpanded ? "rotate-180" : ""
                                 }`}
                                 fill="none"
@@ -971,12 +970,12 @@ const ContainerDetailsPage = () => {
                           </div>
                         </div>
 
-                        {/* Child Sub-Tree: Nested Container Cards */}
+                        {/* Child Sub-Tree: Ultra-Compact Nested Container Cards */}
                         {isExpanded && (
-                          <div className="p-5 bg-slate-50/40">
+                          <div className="p-3 bg-slate-50/50">
                             {vehicleContainers.length === 0 ? (
-                              <div className="text-center py-6 text-gray-500 text-sm bg-white rounded-lg border border-dashed border-gray-300">
-                                No containers assigned to this vehicle yet. Click{" "}
+                              <div className="text-center py-4 text-gray-500 text-xs bg-white rounded-lg border border-dashed border-gray-300">
+                                No containers assigned yet. Click{" "}
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -989,14 +988,13 @@ const ContainerDetailsPage = () => {
                                   className="text-blue-600 font-semibold underline hover:text-blue-800 cursor-pointer"
                                 >
                                   + Add Container
-                                </button>{" "}
-                                to attach one.
+                                </button>
                               </div>
                             ) : (
-                              <div className="pl-4 border-l-4 border-blue-500 space-y-4">
-                                <div className="text-xs font-semibold text-blue-900 flex items-center uppercase tracking-wider">
+                              <div className="pl-3 border-l-3 border-blue-500 space-y-2.5">
+                                <div className="text-[11px] font-semibold text-blue-900 flex items-center uppercase tracking-wider">
                                   <svg
-                                    className="w-4 h-4 mr-1.5 text-blue-600"
+                                    className="w-3.5 h-3.5 mr-1 text-blue-600"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -1011,22 +1009,22 @@ const ContainerDetailsPage = () => {
                                   Sub-Tree Containers for Vehicle #{vehicleIdx + 1} ({vehicleNumber}):
                                 </div>
 
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                   {vehicleContainers.map(
                                     (container, containerIndex) => {
                                       return (
                                         <div
                                           key={container._uid}
-                                          className="border border-gray-200 rounded-xl p-4.5 bg-white shadow-xs relative hover:border-blue-300 transition-colors w-full"
+                                          className="border border-gray-200 rounded-lg p-2.5 px-3 bg-white shadow-xs relative hover:border-blue-300 transition-colors w-full"
                                         >
-                                          {/* Container Header */}
-                                          <div className="flex justify-between items-center mb-3.5 pb-2.5 border-b border-gray-100">
-                                            <div className="flex items-center space-x-2.5">
-                                              <span className="text-xs font-bold text-gray-800 bg-slate-100 px-3 py-1 rounded-md">
+                                          {/* Compact Container Header */}
+                                          <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-gray-100">
+                                            <div className="flex items-center space-x-2">
+                                              <span className="text-[11px] font-bold text-gray-800 bg-slate-100 px-2 py-0.5 rounded">
                                                 Container #{containerIndex + 1}
                                               </span>
                                               {container.containerNo && (
-                                                <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
+                                                <span className="text-[11px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
                                                   {container.containerNo}
                                                 </span>
                                               )}
@@ -1038,11 +1036,11 @@ const ContainerDetailsPage = () => {
                                                 onClick={() =>
                                                   removeContainer(container._uid)
                                                 }
-                                                className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-500 cursor-pointer shadow-xs transition-colors"
+                                                className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded focus:outline-none cursor-pointer transition-colors"
                                                 title="Remove Container"
                                               >
                                                 <svg
-                                                  className="h-3.5 w-3.5 mr-1"
+                                                  className="h-3 w-3 mr-0.5"
                                                   fill="none"
                                                   viewBox="0 0 24 24"
                                                   stroke="currentColor"
@@ -1059,17 +1057,17 @@ const ContainerDetailsPage = () => {
                                             )}
                                           </div>
 
-                                          {/* Fields Form Grid - Full-Width List Card */}
-                                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+                                          {/* Ultra-Compact Fields Form Grid (All on single line on desktop) */}
+                                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2">
                                             {/* Container Number */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                                Container Number *
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
+                                                Container No *
                                               </label>
                                               <input
                                                 type="text"
                                                 required
-                                                className="w-full h-9 text-xs uppercase font-mono font-semibold border border-gray-300 rounded-md px-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs uppercase font-mono font-semibold border border-gray-300 rounded px-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.containerNo || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1084,11 +1082,11 @@ const ContainerDetailsPage = () => {
 
                                             {/* Container Type */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                                Container Type
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
+                                                Type
                                               </label>
                                               <select
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.containerType || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1098,9 +1096,7 @@ const ContainerDetailsPage = () => {
                                                   )
                                                 }
                                               >
-                                                <option value="">
-                                                  Select Container Type
-                                                </option>
+                                                <option value="">Type</option>
                                                 <option value="HQ">HQ</option>
                                                 <option value="DV">DV</option>
                                                 <option value="REFER">REFER</option>
@@ -1109,12 +1105,12 @@ const ContainerDetailsPage = () => {
 
                                             {/* Container Size */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                                Container Size
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
+                                                Size
                                               </label>
                                               <input
                                                 type="text"
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.containerSize || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1129,12 +1125,12 @@ const ContainerDetailsPage = () => {
 
                                             {/* Shipping Line */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                                Shipping Line
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
+                                                Line
                                               </label>
                                               <input
                                                 type="text"
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.line || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1143,18 +1139,18 @@ const ContainerDetailsPage = () => {
                                                     e.target.value
                                                   )
                                                 }
-                                                placeholder="Shipping Line"
+                                                placeholder="Line"
                                               />
                                             </div>
 
                                             {/* Seal 1 */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
                                                 Seal 1
                                               </label>
                                               <input
                                                 type="text"
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.seal1 || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1169,12 +1165,12 @@ const ContainerDetailsPage = () => {
 
                                             {/* Seal 2 */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
                                                 Seal 2
                                               </label>
                                               <input
                                                 type="text"
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.seal2 || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1189,14 +1185,14 @@ const ContainerDetailsPage = () => {
 
                                             {/* Tare Weight */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                                Tare Weight (kg)
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
+                                                Tare (kg)
                                               </label>
                                               <input
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.containerTotalWeight || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1205,20 +1201,20 @@ const ContainerDetailsPage = () => {
                                                     e.target.value
                                                   )
                                                 }
-                                                placeholder="Tare Weight"
+                                                placeholder="Tare"
                                               />
                                             </div>
 
                                             {/* Cargo Weight */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                                Cargo Weight (kg)
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
+                                                Cargo (kg)
                                               </label>
                                               <input
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 value={container.cargoTotalWeight || ""}
                                                 onChange={(e) =>
                                                   updateContainerData(
@@ -1227,26 +1223,26 @@ const ContainerDetailsPage = () => {
                                                     e.target.value
                                                   )
                                                 }
-                                                placeholder="Cargo Weight"
+                                                placeholder="Cargo"
                                               />
                                             </div>
 
                                             {/* Gross Weight */}
                                             <div>
-                                              <label className="block text-xs font-medium text-gray-700 mb-1">
-                                                Gross Weight (kg)
+                                              <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-tight mb-0.5 truncate">
+                                                Gross (kg)
                                               </label>
                                               <input
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                className="w-full h-9 text-xs border border-gray-300 rounded-md px-2.5 bg-gray-100 text-gray-700 focus:outline-none"
+                                                className="w-full h-8 text-xs border border-gray-300 rounded px-2 bg-gray-100 text-gray-700 focus:outline-none"
                                                 value={
                                                   (parseFloat(container.cargoTotalWeight) || 0) +
                                                   (parseFloat(container.containerTotalWeight) || 0)
                                                 }
                                                 disabled
-                                                placeholder="Gross Weight"
+                                                placeholder="Gross"
                                               />
                                             </div>
                                           </div>
