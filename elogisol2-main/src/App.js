@@ -65,10 +65,10 @@ const DashboardLayout = ({ children }) => {
       {/* Main Content */}
       <main
         className={`flex-1 transition-all duration-300 ease-in-out ${
-          collapsed ? "md:ml-16" : "md:ml-64"
+          collapsed ? "md:ml-16" : "md:ml-56"
         } md:min-w-0`}
       >
-        <div className="p-6">{React.cloneElement(children, sidebarProps)}</div>
+        <div className="p-3 sm:p-4">{React.cloneElement(children, sidebarProps)}</div>
       </main>
     </div>
   );

@@ -129,10 +129,10 @@ export function CustomerSidebar({
     <>
       <div
         className={`bg-slate-900 text-white ${
-          collapsed ? "w-16" : "w-64"
+          collapsed ? "w-16" : "w-56"
         } flex-shrink-0 transition-all duration-300 ease-in-out hidden md:flex flex-col shadow-lg border-r border-slate-700 fixed h-full z-40`}
       >
-        <div className="p-4 border-b border-slate-700 bg-slate-800/50">
+        <div className="p-3 border-b border-slate-700 bg-slate-800/50">
           {collapsed ? (
             <div className="flex flex-col items-center space-y-2">
               <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-green-700 rounded-lg flex items-center justify-center shadow-md">
