@@ -847,12 +847,12 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
         </span>
       </h4>
 
-      <div className="overflow-x-auto border rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-x-auto border border-gray-200 rounded-lg">
+        <table className="w-full table-auto divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-20">
-                Vehicle #
+              <th className="px-3 py-2.5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider w-20">
+                #
               </th>
               <th className="px-3 py-2.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[180px]">
                 Vendor Name *

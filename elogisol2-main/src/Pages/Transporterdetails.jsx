@@ -651,7 +651,7 @@ export const TransporterDetails = ({
               </div>
             </div>
           </div>
-          <div className="flex justify-end space-x-3 pt-3 border-t border-gray-200">
+          <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={onBack}
@@ -659,6 +659,17 @@ export const TransporterDetails = ({
             >
               Cancel
             </button>
+            <ContainerDetailsTable
+              vehicleDataList={vehicleDataList}
+              updateVehicleData={updateVehicleData}
+              transportRequestId={transportRequestId}
+              tripType={
+                vehicleType ||
+                (vehicleDataList.length > 0 && vehicleDataList[0].vehicleType
+                  ? vehicleDataList[0].vehicleType
+                  : "")
+              }
+            />
             <button
               type="submit"
               disabled={isSubmitting}
@@ -697,17 +708,6 @@ export const TransporterDetails = ({
               )}
             </button>
           </div>
-          <ContainerDetailsTable
-            vehicleDataList={vehicleDataList}
-            updateVehicleData={updateVehicleData}
-            transportRequestId={transportRequestId}
-            tripType={
-              vehicleType ||
-              (vehicleDataList.length > 0 && vehicleDataList[0].vehicleType
-                ? vehicleDataList[0].vehicleType
-                : "")
-            }
-          />
         </form>
       </div>
       <ModalChecklist
