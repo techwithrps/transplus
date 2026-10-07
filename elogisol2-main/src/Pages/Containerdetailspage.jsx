@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
 import { transporterAPI } from "../utils/Api";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import ResponseModal from "../Components/Responsemodal";
+
+const generateUid = () =>
+  `uid_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
 const ContainerDetailsPage = () => {
   const navigate = useNavigate();
@@ -13,141 +16,270 @@ const ContainerDetailsPage = () => {
   const [transportRequestId, setTransportRequestId] = useState("");
   const [vehicleDataList, setVehicleDataList] = useState([]);
   const [existingTransporterData, setExistingTransporterData] = useState([]);
-  const [groupedContainers, setGroupedContainers] = useState({});
-  const [expandedVehicle, setExpandedVehicle] = useState(null);
+  const [expandedVehicles, setExpandedVehicles] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
 
-  // Create empty container with a unique client-side ID
-  const createEmptyContainer = () => ({
-    clientId: `temp-${Date.now()}-${Math.random()}`,
-    id: null,
-    containerNo: "",
-    numberOfContainers: "",
-    containerType: "",
-    containerSize: "",
-    line: "",
-    seal1: "",
-    seal2: "",
-    containerTotalWeight: "",
-    cargoTotalWeight: "",
-    remarks: "",
-    vehicleNumber: "",
-    isDirty: true, // New containers are always dirty
-  });
+  const initialLoadDoneRef = useRef(false);
 
-  // Initialize with data from sessionStorage
-  useEffect(() => {
-    const storedContainerData = sessionStorage.getItem("containerData");
-    const storedRequestId = sessionStorage.getItem("transportRequestId");
-    const storedVehicleData = sessionStorage.getItem("vehicleData");
-
-    if (storedRequestId) {
-      setTransportRequestId(storedRequestId);
-    }
-
-    if (storedVehicleData) {
-      try {
-        const parsedVehicleData = JSON.parse(storedVehicleData);
-        setVehicleDataList(parsedVehicleData);
-      } catch (error) {
-        console.error("Error parsing vehicle data:", error);
-        toast.error("Failed to load vehicle data");
-      }
-    }
-
-    if (storedContainerData) {
-      try {
-        const parsedData = JSON.parse(storedContainerData);
-        const containerData = parsedData.map((container) => ({
-          ...container,
-          id: container.id || null,
-          clientId: container.clientId || `temp-${Date.now()}-${Math.random()}`,
-          isDirty: false, // Initialize as clean
-        }));
-
-        setContainers(
-          containerData.length > 0 ? containerData : [createEmptyContainer()]
-        );
-      } catch (error) {
-        console.error("Error parsing container data:", error);
-        setContainers([createEmptyContainer()]);
-      }
-    } else {
-      setContainers([createEmptyContainer()]);
-    }
-  }, []);
+  // Create empty container with a guaranteed unique client-side UID
+  const createEmptyContainer = (vehicleNumber = "") => {
+    const uid = generateUid();
+    return {
+      _uid: uid,
+      clientId: uid,
+      id: null,
+      containerNo: "",
+      numberOfContainers: "1",
+      containerType: "",
+      containerSize: "",
+      line: "",
+      seal1: "",
+      seal2: "",
+      containerTotalWeight: "",
+      cargoTotalWeight: "",
+      remarks: "",
+      vehicleNumber: vehicleNumber || "",
+      isDirty: true,
+    };
+  };
 
   // Group containers by vehicle number
-  useEffect(() => {
+  const groupedContainers = useMemo(() => {
     const grouped = {};
+
+    // Ensure all vehicles from vehicleDataList exist in the map
+    if (vehicleDataList && vehicleDataList.length > 0) {
+      vehicleDataList.forEach((v) => {
+        const vNum = v.vehicleNumber || v.vehicle_number;
+        if (vNum) {
+          grouped[vNum] = [];
+        }
+      });
+    }
+
+    // Assign containers to their vehicle
     containers.forEach((container) => {
-      const vehicleNumber = container.vehicleNumber || "unassigned";
-      if (!grouped[vehicleNumber]) {
-        grouped[vehicleNumber] = [];
+      const vNum = container.vehicleNumber || "unassigned";
+      if (!grouped[vNum]) {
+        grouped[vNum] = [];
       }
-      grouped[vehicleNumber].push(container);
+      grouped[vNum].push(container);
     });
 
-    setGroupedContainers(grouped);
-    if (expandedVehicle === null && Object.keys(grouped).length > 0) {
-      setExpandedVehicle(Object.keys(grouped)[0]);
-    }
-  }, [containers, expandedVehicle]);
+    return grouped;
+  }, [vehicleDataList, containers]);
 
-  // Fetch existing transporter data
-  const fetchExistingTransporterData = async () => {
+  // Initial load effect: load session storage and fetch backend data once
+  useEffect(() => {
+    const initPageData = async () => {
+      const storedRequestId = sessionStorage.getItem("transportRequestId") || "";
+      const storedVehicleData = sessionStorage.getItem("vehicleData");
+      const storedContainerData = sessionStorage.getItem("containerData");
+
+      if (storedRequestId) {
+        setTransportRequestId(storedRequestId);
+      }
+
+      let parsedVehicles = [];
+      if (storedVehicleData) {
+        try {
+          parsedVehicles = JSON.parse(storedVehicleData);
+          if (Array.isArray(parsedVehicles)) {
+            setVehicleDataList(parsedVehicles);
+          }
+        } catch (error) {
+          console.error("Error parsing vehicle data:", error);
+        }
+      }
+
+      let parsedContainers = [];
+      if (storedContainerData) {
+        try {
+          const parsed = JSON.parse(storedContainerData);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            parsedContainers = parsed.map((c) => ({
+              ...c,
+              _uid: c._uid || generateUid(),
+              clientId: c.clientId || c._uid || generateUid(),
+              id: c.id || null,
+              isDirty: false,
+            }));
+          }
+        } catch (error) {
+          console.error("Error parsing container data from sessionStorage:", error);
+        }
+      }
+
+      if (parsedContainers.length > 0) {
+        setContainers(parsedContainers);
+      }
+
+      // If we have a request ID, fetch latest transporter & container data from backend
+      if (storedRequestId && !initialLoadDoneRef.current) {
+        initialLoadDoneRef.current = true;
+        setIsLoading(true);
+
+        try {
+          // 1. Fetch transporter details
+          const transporterRes = await transporterAPI.getTransporterByRequestId(storedRequestId);
+          let loadedVehicles = parsedVehicles;
+
+          if (transporterRes.success && transporterRes.data) {
+            const rawData = Array.isArray(transporterRes.data)
+              ? transporterRes.data
+              : [transporterRes.data];
+            setExistingTransporterData(rawData);
+
+            if (rawData.length > 0) {
+              loadedVehicles = rawData.map((item) => ({
+                vehicleNumber: item.vehicle_number,
+                transporterName: item.transporter_name || "",
+                vehicleSequence: item.vehicle_sequence || 0,
+              }));
+              setVehicleDataList(loadedVehicles);
+              sessionStorage.setItem("vehicleData", JSON.stringify(loadedVehicles));
+            }
+          }
+
+          // 2. Fetch container details for all vehicles
+          const backendContainers = [];
+          if (loadedVehicles && loadedVehicles.length > 0) {
+            for (const vehicle of loadedVehicles) {
+              const vNum = vehicle.vehicleNumber || vehicle.vehicle_number;
+              if (!vNum) continue;
+
+              try {
+                const containerRes = await transporterAPI.getContainersByVehicleNumber(
+                  storedRequestId,
+                  vNum
+                );
+                if (containerRes.success && Array.isArray(containerRes.data)) {
+                  containerRes.data.forEach((item) => {
+                    const uid = generateUid();
+                    backendContainers.push({
+                      _uid: uid,
+                      id: item.id,
+                      clientId: `temp-${item.id}`,
+                      containerNo: item.container_no || "",
+                      numberOfContainers: item.number_of_containers?.toString() || "1",
+                      containerType: item.container_type || "",
+                      containerSize: item.container_size || "",
+                      line: item.line || "",
+                      seal1: item.seal1 || item.seal_no || "",
+                      seal2: item.seal2 || "",
+                      containerTotalWeight: item.container_total_weight?.toString() || "",
+                      cargoTotalWeight: item.cargo_total_weight?.toString() || "",
+                      remarks: item.remarks || "",
+                      vehicleNumber: item.vehicle_number || vNum,
+                      isDirty: false,
+                    });
+                  });
+                }
+              } catch (err) {
+                console.error(`Error loading containers for vehicle ${vNum}:`, err);
+              }
+            }
+          }
+
+          // If backend returned containers, use them
+          if (backendContainers.length > 0) {
+            setContainers(backendContainers);
+            sessionStorage.setItem("containerData", JSON.stringify(backendContainers));
+          } else if (parsedContainers.length === 0) {
+            // No containers in backend and none in session: create 1 default container
+            const defaultVehicle = loadedVehicles[0]?.vehicleNumber || "";
+            const initialContainer = createEmptyContainer(defaultVehicle);
+            setContainers([initialContainer]);
+            sessionStorage.setItem("containerData", JSON.stringify([initialContainer]));
+          }
+        } catch (error) {
+          console.error("Error during initial data loading:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initPageData();
+  }, []);
+
+  // Reload all data after container updates or refresh button
+  const reloadDataAfterUpdate = async () => {
     if (!transportRequestId) return;
 
+    setIsLoading(true);
     try {
-      const response = await transporterAPI.getTransporterByRequestId(
-        transportRequestId
-      );
-      if (response.success) {
-        const transporterData = Array.isArray(response.data)
-          ? response.data
-          : [response.data];
-        setExistingTransporterData(transporterData);
+      const transporterRes = await transporterAPI.getTransporterByRequestId(transportRequestId);
+      let activeVehicles = vehicleDataList;
 
-        // Update vehicleDataList if not already set
-        if (vehicleDataList.length === 0) {
-          const uniqueVehicles = transporterData.map((item) => ({
+      if (transporterRes.success && transporterRes.data) {
+        const rawData = Array.isArray(transporterRes.data)
+          ? transporterRes.data
+          : [transporterRes.data];
+        setExistingTransporterData(rawData);
+
+        if (rawData.length > 0) {
+          activeVehicles = rawData.map((item) => ({
             vehicleNumber: item.vehicle_number,
             transporterName: item.transporter_name || "",
             vehicleSequence: item.vehicle_sequence || 0,
           }));
-          setVehicleDataList(uniqueVehicles);
-          sessionStorage.setItem("vehicleData", JSON.stringify(uniqueVehicles));
+          setVehicleDataList(activeVehicles);
+          sessionStorage.setItem("vehicleData", JSON.stringify(activeVehicles));
         }
       }
-    } catch (error) {
-      console.error("Error fetching existing transporter data:", error);
-      toast.error("Failed to load transporter data");
-    }
-  };
 
-  // Force reload all data after container updates
-  const reloadDataAfterUpdate = async () => {
-    if (!transportRequestId) return;
-    
-    setIsLoading(true);
-    try {
-      // Clear existing data first
-      setContainers([]);
-      setExistingTransporterData([]);
-      
-      // Reload transporter data
-      await fetchExistingTransporterData();
-      
-      // Reload containers for all vehicles
-      if (vehicleDataList.length > 0) {
-        const loadPromises = vehicleDataList.map((vehicle) =>
-          loadVehicleContainers(vehicle.vehicleNumber)
-        );
-        await Promise.all(loadPromises);
-        
-        toast.success("Container data refreshed successfully");
+      const refreshedContainers = [];
+      if (activeVehicles.length > 0) {
+        for (const vehicle of activeVehicles) {
+          const vNum = vehicle.vehicleNumber || vehicle.vehicle_number;
+          if (!vNum) continue;
+
+          try {
+            const containerRes = await transporterAPI.getContainersByVehicleNumber(
+              transportRequestId,
+              vNum
+            );
+            if (containerRes.success && Array.isArray(containerRes.data)) {
+              containerRes.data.forEach((item) => {
+                const uid = generateUid();
+                refreshedContainers.push({
+                  _uid: uid,
+                  id: item.id,
+                  clientId: `temp-${item.id}`,
+                  containerNo: item.container_no || "",
+                  numberOfContainers: item.number_of_containers?.toString() || "1",
+                  containerType: item.container_type || "",
+                  containerSize: item.container_size || "",
+                  line: item.line || "",
+                  seal1: item.seal1 || item.seal_no || "",
+                  seal2: item.seal2 || "",
+                  containerTotalWeight: item.container_total_weight?.toString() || "",
+                  cargoTotalWeight: item.cargo_total_weight?.toString() || "",
+                  remarks: item.remarks || "",
+                  vehicleNumber: item.vehicle_number || vNum,
+                  isDirty: false,
+                });
+              });
+            }
+          } catch (err) {
+            console.error(`Error refreshing containers for vehicle ${vNum}:`, err);
+          }
+        }
       }
+
+      if (refreshedContainers.length > 0) {
+        setContainers(refreshedContainers);
+        sessionStorage.setItem("containerData", JSON.stringify(refreshedContainers));
+      } else {
+        const defaultVehicle = activeVehicles[0]?.vehicleNumber || "";
+        const initialContainer = createEmptyContainer(defaultVehicle);
+        setContainers([initialContainer]);
+        sessionStorage.setItem("containerData", JSON.stringify([initialContainer]));
+      }
+
+      toast.success("Container data refreshed successfully");
     } catch (error) {
       console.error("Error reloading data after update:", error);
       toast.error("Failed to refresh container data");
@@ -156,116 +288,52 @@ const ContainerDetailsPage = () => {
     }
   };
 
-  // Load transporter data on mount
-  useEffect(() => {
-    if (transportRequestId) {
-      fetchExistingTransporterData();
-    }
-  }, [transportRequestId]);
-
-  // Load containers for all vehicles
-  const loadVehicleContainers = async (vehicleNumber) => {
-    if (!transportRequestId || !vehicleNumber) return;
-
-    try {
-      const response = await transporterAPI.getContainersByVehicleNumber(
-        transportRequestId,
-        vehicleNumber
-      );
-
-      if (response.success && response.data && response.data.length > 0) {
-        const vehicleContainers = response.data.map((container) => ({
-          id: container.id,
-          clientId: `temp-${container.id}`,
-          containerNo: container.container_no || "",
-          numberOfContainers: container.number_of_containers?.toString() || "",
-          containerType: container.container_type || "",
-          containerSize: container.container_size || "",
-          line: container.line || "",
-          seal1: container.seal1 || container.seal_no || "",
-          seal2: container.seal2 || "",
-          containerTotalWeight:
-            container.container_total_weight?.toString() || "",
-          cargoTotalWeight: container.cargo_total_weight?.toString() || "",
-          remarks: container.remarks || "",
-          vehicleNumber: container.vehicle_number || "",
-          isDirty: false, // Initialize as clean
-        }));
-
-        setContainers((prev) => {
-          const filteredPrev = prev.filter(
-            (c) => c.vehicleNumber !== vehicleNumber
-          );
-          const newContainerList = [...filteredPrev, ...vehicleContainers];
-          sessionStorage.setItem(
-            "containerData",
-            JSON.stringify(newContainerList)
-          );
-          return newContainerList;
-        });
-      }
-    } catch (error) {
-      console.error(
-        `Error loading containers for vehicle ${vehicleNumber}:`,
-        error
-      );
-      toast.error(`Failed to load containers for vehicle ${vehicleNumber}`);
-    }
-  };
-
-  useEffect(() => {
-    const loadAllVehicleContainers = async () => {
-      if (!transportRequestId || vehicleDataList.length === 0) return;
-
-      setIsLoading(true);
-      try {
-        const loadPromises = vehicleDataList.map((vehicle) =>
-          loadVehicleContainers(vehicle.vehicleNumber)
-        );
-        await Promise.all(loadPromises);
-        toast.success("All vehicle containers loaded successfully");
-      } catch (error) {
-        console.error("Error loading vehicle containers:", error);
-        toast.error("Failed to load some vehicle containers");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadAllVehicleContainers();
-  }, [vehicleDataList, transportRequestId]);
-
-  // Navigation and session storage update
+  // Back Navigation
   const onBack = () => {
     sessionStorage.setItem("containerData", JSON.stringify(containers));
     navigate(-1);
   };
 
-  // Add container
+  // Add container to specific vehicle
   const addContainer = (vehicleNumber = "") => {
-    const newContainer = createEmptyContainer();
-    newContainer.vehicleNumber = vehicleNumber;
-    const updatedContainers = [...containers, newContainer];
-    setContainers(updatedContainers);
+    const newContainer = createEmptyContainer(vehicleNumber);
+    setContainers((prev) => {
+      const updated = [...prev, newContainer];
+      sessionStorage.setItem("containerData", JSON.stringify(updated));
+      return updated;
+    });
+
+    if (vehicleNumber) {
+      setExpandedVehicles((prev) => ({
+        ...prev,
+        [vehicleNumber]: true,
+      }));
+    }
   };
 
-  // Remove container using its unique ID (clientId or id)
-  const removeContainer = async (identifier) => {
+  // Remove container strictly using its unique `_uid`
+  const removeContainer = async (targetUid) => {
+    const containerToRemove = containers.find(
+      (c) =>
+        c._uid === targetUid ||
+        (c.id && c.id === targetUid) ||
+        (c.clientId && c.clientId === targetUid)
+    );
+
+    if (!containerToRemove) {
+      console.warn("Container not found for removal:", targetUid);
+      return;
+    }
+
     if (containers.length <= 1) {
       toast.warning("At least one container entry is required");
       return;
     }
 
-    const containerToRemove = containers.find(
-      (c) => (c.id || c.clientId) === identifier
-    );
-
-    if (containerToRemove && containerToRemove.id) {
+    if (containerToRemove.id) {
       try {
         setIsLoading(true);
-        const response = await transporterAPI.deleteContainer(
-          containerToRemove.id
-        );
+        const response = await transporterAPI.deleteContainer(containerToRemove.id);
         if (!response.success) {
           throw new Error(response.message || "Failed to delete container");
         }
@@ -282,15 +350,19 @@ const ContainerDetailsPage = () => {
       toast.success("Container removed");
     }
 
-    const updatedContainers = containers.filter(
-      (c) => (c.id || c.clientId) !== identifier
-    );
-    setContainers(updatedContainers);
-    sessionStorage.setItem("containerData", JSON.stringify(updatedContainers));
+    setContainers((prev) => {
+      const updatedContainers = prev.filter(
+        (c) =>
+          c._uid !== containerToRemove._uid &&
+          (!containerToRemove.id || c.id !== containerToRemove.id)
+      );
+      sessionStorage.setItem("containerData", JSON.stringify(updatedContainers));
+      return updatedContainers;
+    });
   };
 
-  // Update container data using its unique ID (clientId or id)
-  const updateContainerData = (identifier, field, value) => {
+  // Update container data strictly using its unique `_uid`
+  const updateContainerData = (targetUid, field, value) => {
     if (field === "containerNo") {
       value = value.toUpperCase();
       if (value.length > 11) {
@@ -305,22 +377,28 @@ const ContainerDetailsPage = () => {
       }
     }
 
-    setContainers(
-      containers.map((container) => {
-        const currentIdentifier = container.id || container.clientId;
-        if (currentIdentifier === identifier) {
+    setContainers((prev) => {
+      const updated = prev.map((container) => {
+        if (
+          container._uid === targetUid ||
+          (container.id && container.id === targetUid) ||
+          (container.clientId && container.clientId === targetUid)
+        ) {
           return { ...container, [field]: value, isDirty: true };
         }
         return container;
-      })
-    );
+      });
+      sessionStorage.setItem("containerData", JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  // Toggle vehicle expansion
+  // Toggle vehicle accordion
   const toggleVehicleExpansion = (vehicleNumber) => {
-    setExpandedVehicle(
-      expandedVehicle === vehicleNumber ? null : vehicleNumber
-    );
+    setExpandedVehicles((prev) => ({
+      ...prev,
+      [vehicleNumber]: prev[vehicleNumber] === false ? true : false,
+    }));
   };
 
   // Validate container data with ISO 6346 check digit
@@ -357,10 +435,7 @@ const ContainerDetailsPage = () => {
           );
         } else {
           const expectedCheckDigit = calculateCheckDigit(containerNo);
-          const actualCheckDigit = parseInt(
-            containerNo.slice(-1),
-            10
-          );
+          const actualCheckDigit = parseInt(containerNo.slice(-1), 10);
           if (expectedCheckDigit !== actualCheckDigit) {
             errors.push(
               `Container ${
@@ -442,7 +517,7 @@ const ContainerDetailsPage = () => {
         });
       const containerHistories = await Promise.all(containerHistoryPromises);
       const historyWarnings = containerHistories.filter(
-        (h) => h.history.totalUses > 0
+        (h) => h.history && h.history.totalUses > 0
       );
 
       if (historyWarnings.length > 0) {
@@ -468,9 +543,9 @@ const ContainerDetailsPage = () => {
       // Prepare payload for batch container assignment
       const vehicleContainers = vehicleDataList
         .map((vehicle) => {
+          const vNum = vehicle.vehicleNumber || vehicle.vehicle_number;
           const containersForVehicle = containers.filter(
-            (c) =>
-              c.vehicleNumber === vehicle.vehicleNumber && (c.isDirty || !c.id)
+            (c) => c.vehicleNumber === vNum && (c.isDirty || !c.id)
           );
 
           if (containersForVehicle.length === 0) {
@@ -478,11 +553,11 @@ const ContainerDetailsPage = () => {
           }
 
           return {
-            vehicle_number: vehicle.vehicleNumber,
+            vehicle_number: vNum,
             vehicle_sequence: vehicle.vehicleSequence || 0,
             containers: containersForVehicle.map((container) => ({
               id: container.id,
-              clientId: container.clientId,
+              clientId: container._uid || container.clientId,
               container_no: container.containerNo.trim().toUpperCase(),
               line: container.line?.trim() || null,
               seal_no: container.seal1?.trim() || null,
@@ -503,7 +578,7 @@ const ContainerDetailsPage = () => {
 
       if (vehicleContainers.length === 0) {
         toast.dismiss(loadingId);
-        toast.info("No changes to submit.");
+        toast.info("No unsaved changes to submit.");
         setIsSubmitting(false);
         return;
       }
@@ -514,59 +589,66 @@ const ContainerDetailsPage = () => {
       );
 
       if (response.success) {
-        // Create a map of the containers that were successfully saved to the server
+        // Map saved containers back to local state
         const savedContainersMap = new Map();
-        response.data.forEach((vc) => {
-          vc.containers.forEach((container) => {
-            const savedContainer = {
-              id: container.id,
-              clientId: container.clientId || `temp-${container.id}`,
-              containerNo: container.container_no || "",
-              numberOfContainers:
-                container.number_of_containers?.toString() || "",
-              containerType: container.container_type || "",
-              containerSize: container.container_size || "",
-              line: container.line || "",
-              seal1: container.seal1 || container.seal_no || "",
-              seal2: container.seal2 || "",
-              containerTotalWeight:
-                container.container_total_weight?.toString() || "",
-              cargoTotalWeight: container.cargo_total_weight?.toString() || "",
-              remarks: container.remarks || "",
-              vehicleNumber: vc.vehicle_number || "",
-              isDirty: false, // Mark as clean
-            };
+        if (Array.isArray(response.data)) {
+          response.data.forEach((vc) => {
+            if (Array.isArray(vc.containers)) {
+              vc.containers.forEach((container) => {
+                const savedContainer = {
+                  id: container.id,
+                  clientId: container.clientId || `temp-${container.id}`,
+                  containerNo: container.container_no || "",
+                  numberOfContainers:
+                    container.number_of_containers?.toString() || "1",
+                  containerType: container.container_type || "",
+                  containerSize: container.container_size || "",
+                  line: container.line || "",
+                  seal1: container.seal1 || container.seal_no || "",
+                  seal2: container.seal2 || "",
+                  containerTotalWeight:
+                    container.container_total_weight?.toString() || "",
+                  cargoTotalWeight:
+                    container.cargo_total_weight?.toString() || "",
+                  remarks: container.remarks || "",
+                  vehicleNumber: vc.vehicle_number || "",
+                  isDirty: false,
+                };
 
-            if (container.id) {
-              savedContainersMap.set(container.id, savedContainer);
-            }
-            if (container.clientId) {
-              savedContainersMap.set(container.clientId, savedContainer);
+                if (container.id) {
+                  savedContainersMap.set(String(container.id), savedContainer);
+                }
+                if (container.clientId) {
+                  savedContainersMap.set(String(container.clientId), savedContainer);
+                }
+              });
             }
           });
-        });
+        }
 
-        // Merge the updated data back into the main containers state
+        // Merge saved data into state
         setContainers((prevContainers) => {
           const newContainers = prevContainers.map((pc) => {
-            const identifier = pc.id || pc.clientId;
-            if (savedContainersMap.has(identifier)) {
-              return { ...pc, ...savedContainersMap.get(identifier) };
+            const keyByUid = pc._uid && savedContainersMap.get(String(pc._uid));
+            const keyById = pc.id && savedContainersMap.get(String(pc.id));
+            const keyByClientId =
+              pc.clientId && savedContainersMap.get(String(pc.clientId));
+
+            const matched = keyByUid || keyById || keyByClientId;
+            if (matched) {
+              return { ...pc, ...matched, _uid: pc._uid };
             }
-            return pc;
+            return { ...pc, isDirty: false };
           });
 
-          sessionStorage.setItem(
-            "containerData",
-            JSON.stringify(newContainers)
-          );
+          sessionStorage.setItem("containerData", JSON.stringify(newContainers));
           return newContainers;
         });
 
         toast.dismiss(loadingId);
-        if (response.data.some((vc) => vc.hasWarnings)) {
+        if (response.data && response.data.some((vc) => vc.hasWarnings)) {
           response.data.forEach((vc) => {
-            if (vc.hasWarnings) {
+            if (vc.hasWarnings && Array.isArray(vc.containers)) {
               vc.containers.forEach((container) => {
                 if (container.message) {
                   toast.warning(container.message, { position: "top-center" });
@@ -576,13 +658,18 @@ const ContainerDetailsPage = () => {
           });
         }
 
+        const totalSavedCount = Array.isArray(response.data)
+          ? response.data.reduce(
+              (sum, vc) => sum + (Array.isArray(vc.containers) ? vc.containers.length : 0),
+              0
+            )
+          : 0;
+
         toast.success(
           <div className="flex flex-col">
             <span className="font-bold text-lg mb-1">Success</span>
             <p className="text-sm">
-              Successfully updated{" "}
-              {response.data.reduce((sum, vc) => sum + vc.containers.length, 0)}{" "}
-              container(s)
+              Successfully saved {totalSavedCount} container(s)
             </p>
           </div>,
           { position: "top-center", autoClose: 5000 }
@@ -590,16 +677,17 @@ const ContainerDetailsPage = () => {
 
         setShowModal(true);
         setModalData({
-          containers: response.data.flatMap((vc) =>
-            vc.containers.map((c) => ({
-              ...c,
-              vehicle_number: vc.vehicle_number,
-            }))
-          ),
+          containers: Array.isArray(response.data)
+            ? response.data.flatMap((vc) =>
+                Array.isArray(vc.containers)
+                  ? vc.containers.map((c) => ({
+                      ...c,
+                      vehicle_number: vc.vehicle_number,
+                    }))
+                  : []
+              )
+            : [],
         });
-
-        // Reload all data to reflect backend changes
-        await reloadDataAfterUpdate();
       } else {
         throw new Error(response.message || "Failed to update containers");
       }
@@ -638,9 +726,7 @@ const ContainerDetailsPage = () => {
         draggable
         pauseOnHover
         theme="light"
-        style={{
-          width: "400px",
-        }}
+        style={{ width: "400px" }}
         toastStyle={{
           borderRadius: "8px",
           padding: "16px",
@@ -664,8 +750,7 @@ const ContainerDetailsPage = () => {
                 </p>
                 {existingTransporterData.length > 0 && (
                   <p className="text-sm text-green-600 mt-1">
-                    ✓ {existingTransporterData.length} transporter record(s)
-                    found
+                    ✓ {existingTransporterData.length} transporter record(s) found
                   </p>
                 )}
               </div>
@@ -717,7 +802,7 @@ const ContainerDetailsPage = () => {
 
         {/* Warning if no transporter data */}
         {existingTransporterData.length === 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 border rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg
@@ -749,7 +834,7 @@ const ContainerDetailsPage = () => {
           </div>
         )}
 
-        {/* Main Content - Card-based UI */}
+        {/* Main Content - Vehicle Cards & Container Management */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -765,43 +850,62 @@ const ContainerDetailsPage = () => {
               {/* Vehicle Groups */}
               <div className="space-y-6">
                 {Object.entries(groupedContainers).map(
-                  ([vehicleNumber, vehicleContainers]) => (
-                    <div
-                      key={vehicleNumber}
-                      className="border border-gray-200 rounded-lg overflow-hidden"
-                    >
-                      {/* Vehicle Header */}
+                  ([vehicleNumber, vehicleContainers]) => {
+                    const isExpanded = expandedVehicles[vehicleNumber] !== false;
+
+                    return (
                       <div
-                        className={`px-4 py-3 flex justify-between items-center cursor-pointer ${
-                          expandedVehicle === vehicleNumber
-                            ? "bg-blue-50"
-                            : "bg-gray-50"
-                        }`}
-                        onClick={() => toggleVehicleExpansion(vehicleNumber)}
+                        key={vehicleNumber}
+                        className="border border-gray-200 rounded-lg overflow-hidden"
                       >
-                        <div className="flex items-center">
-                          <span className="font-medium text-gray-900">
-                            {vehicleNumber === "unassigned"
-                              ? "Unassigned Containers"
-                              : `Vehicle: ${vehicleNumber}`}
-                          </span>
-                          <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                            {vehicleContainers.length} container
-                            {vehicleContainers.length !== 1 ? "s" : ""}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              addContainer(vehicleNumber);
-                            }}
-                            className="mr-2 inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            title="Add container to this vehicle"
-                          >
+                        {/* Vehicle Header */}
+                        <div
+                          className={`px-4 py-3 flex justify-between items-center cursor-pointer select-none transition-colors ${
+                            isExpanded ? "bg-blue-50" : "bg-gray-50 hover:bg-gray-100"
+                          }`}
+                          onClick={() => toggleVehicleExpansion(vehicleNumber)}
+                        >
+                          <div className="flex items-center">
+                            <span className="font-medium text-gray-900">
+                              {vehicleNumber === "unassigned"
+                                ? "Unassigned Containers"
+                                : `Vehicle: ${vehicleNumber}`}
+                            </span>
+                            <span className="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                              {vehicleContainers.length} container
+                              {vehicleContainers.length !== 1 ? "s" : ""}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addContainer(
+                                  vehicleNumber === "unassigned" ? "" : vehicleNumber
+                                );
+                              }}
+                              className="mr-2 inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                              title="Add container to this vehicle"
+                            >
+                              <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                />
+                              </svg>
+                            </button>
                             <svg
-                              className="h-4 w-4"
+                              className={`h-5 w-5 text-gray-500 transform transition-transform duration-200 ${
+                                isExpanded ? "rotate-180" : ""
+                              }`}
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -810,261 +914,256 @@ const ContainerDetailsPage = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                d="M19 9l-7 7-7-7"
                               />
                             </svg>
-                          </button>
-                          <svg
-                            className={`h-5 w-5 text-gray-500 transform transition-transform ${
-                              expandedVehicle === vehicleNumber
-                                ? "rotate-180"
-                                : ""
-                            }`}
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-
-                      {/* Container Cards */}
-                      {expandedVehicle === vehicleNumber && (
-                        <div className="p-4 bg-white">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {vehicleContainers.map(
-                              (container, containerIndex) => {
-                                const identifier =
-                                  container.id || container.clientId;
-                                return (
-                                  <div
-                                    key={identifier}
-                                    className="border border-gray-200 rounded-lg p-4 bg-gray-50"
-                                    data-vehicle={vehicleNumber}
-                                    data-container={JSON.stringify(container)}
-                                  >
-                                    <div className="flex justify-between items-center mb-4">
-                                      <h3 className="text-md font-medium text-gray-900">
-                                        Container #{containerIndex + 1}
-                                      </h3>
-                                      {containers.length > 1 && (
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            removeContainer(identifier)
-                                          }
-                                          className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                          title="Remove Container"
-                                        >
-                                          <svg
-                                            className="h-4 w-4"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth={2}
-                                              d="M6 18L18 6M6 6l12 12"
-                                            />
-                                          </svg>
-                                        </button>
-                                      )}
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-0">
-                                          Container Number *
-                                        </label>
-                                        <input
-                                          type="text"
-                                          required
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.containerNo}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "containerNo",
-                                              e.target.value
-                                            )
-                                          }
-                                          placeholder="Container Number"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Container Type
-                                        </label>
-                                        <select
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.containerType}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "containerType",
-                                              e.target.value
-                                            )
-                                          }
-                                        >
-                                          <option value="">
-                                            Select Container Type
-                                          </option>
-                                          <option value="HQ">HQ</option>
-                                          <option value="DV">DV</option>
-                                          <option value="REFER">REFER</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Container Size
-                                        </label>
-                                        <input
-                                          type="text"
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.containerSize}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "containerSize",
-                                              e.target.value
-                                            )
-                                          }
-                                          placeholder="Container Size"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Shipping Line
-                                        </label>
-                                        <input
-                                          type="text"
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.line}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "line",
-                                              e.target.value
-                                            )
-                                          }
-                                          placeholder="Shipping Line"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Seal 1
-                                        </label>
-                                        <input
-                                          type="text"
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.seal1}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "seal1",
-                                              e.target.value
-                                            )
-                                          }
-                                          placeholder="Seal 1"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Seal 2
-                                        </label>
-                                        <input
-                                          type="text"
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.seal2}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "seal2",
-                                              e.target.value
-                                            )
-                                          }
-                                          placeholder="Seal 2"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Tare Weight (kg)
-                                        </label>
-                                        <input
-                                          type="number"
-                                          min="0"
-                                          step="0.01"
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.containerTotalWeight}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "containerTotalWeight",
-                                              e.target.value
-                                            )
-                                          }
-                                          placeholder="Container Weight"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Cargo Weight (kg)
-                                        </label>
-                                        <input
-                                          type="number"
-                                          min="0"
-                                          step="0.01"
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={container.cargoTotalWeight}
-                                          onChange={(e) =>
-                                            updateContainerData(
-                                              identifier,
-                                              "cargoTotalWeight",
-                                              e.target.value
-                                            )
-                                          }
-                                          placeholder="Cargo Weight"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                          Gross Weight (kg)
-                                        </label>
-                                        <input
-                                          type="number"
-                                          min="0"
-                                          step="0.01"
-                                          className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          value={
-                                            (parseFloat(
-                                              container.cargoTotalWeight
-                                            ) || 0) +
-                                            (parseFloat(
-                                              container.containerTotalWeight
-                                            ) || 0)
-                                          }
-                                          disabled
-                                          placeholder="Gross Weight"
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              }
-                            )}
                           </div>
                         </div>
-                      )}
-                    </div>
-                  )
+
+                        {/* Container Cards */}
+                        {isExpanded && (
+                          <div className="p-4 bg-white">
+                            {vehicleContainers.length === 0 ? (
+                              <div className="text-center py-6 text-gray-500 text-sm">
+                                No containers added for this vehicle yet. Click the{" "}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    addContainer(
+                                      vehicleNumber === "unassigned"
+                                        ? ""
+                                        : vehicleNumber
+                                    )
+                                  }
+                                  className="text-blue-600 font-semibold underline hover:text-blue-800"
+                                >
+                                  + Add Container
+                                </button>{" "}
+                                button to add one.
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {vehicleContainers.map(
+                                  (container, containerIndex) => {
+                                    return (
+                                      <div
+                                        key={container._uid}
+                                        className="border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-sm relative"
+                                      >
+                                        <div className="flex justify-between items-center mb-4">
+                                          <h3 className="text-md font-medium text-gray-900">
+                                            Container #{containerIndex + 1}
+                                          </h3>
+                                          {containers.length > 1 && (
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                removeContainer(container._uid)
+                                              }
+                                              className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer"
+                                              title="Remove Container"
+                                            >
+                                              <svg
+                                                className="h-4 w-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth={2}
+                                                  d="M6 18L18 6M6 6l12 12"
+                                                />
+                                              </svg>
+                                            </button>
+                                          )}
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Container Number *
+                                            </label>
+                                            <input
+                                              type="text"
+                                              required
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.containerNo || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "containerNo",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="ABCD1234567"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Container Type
+                                            </label>
+                                            <select
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.containerType || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "containerType",
+                                                  e.target.value
+                                                )
+                                              }
+                                            >
+                                              <option value="">
+                                                Select Container Type
+                                              </option>
+                                              <option value="HQ">HQ</option>
+                                              <option value="DV">DV</option>
+                                              <option value="REFER">REFER</option>
+                                            </select>
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Container Size
+                                            </label>
+                                            <input
+                                              type="text"
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.containerSize || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "containerSize",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="20ft / 40ft"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Shipping Line
+                                            </label>
+                                            <input
+                                              type="text"
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.line || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "line",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="Shipping Line"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Seal 1
+                                            </label>
+                                            <input
+                                              type="text"
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.seal1 || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "seal1",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="Seal 1"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Seal 2
+                                            </label>
+                                            <input
+                                              type="text"
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.seal2 || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "seal2",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="Seal 2"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Tare Weight (kg)
+                                            </label>
+                                            <input
+                                              type="number"
+                                              min="0"
+                                              step="0.01"
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.containerTotalWeight || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "containerTotalWeight",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="Container Weight"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Cargo Weight (kg)
+                                            </label>
+                                            <input
+                                              type="number"
+                                              min="0"
+                                              step="0.01"
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              value={container.cargoTotalWeight || ""}
+                                              onChange={(e) =>
+                                                updateContainerData(
+                                                  container._uid,
+                                                  "cargoTotalWeight",
+                                                  e.target.value
+                                                )
+                                              }
+                                              placeholder="Cargo Weight"
+                                            />
+                                          </div>
+                                          <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                              Gross Weight (kg)
+                                            </label>
+                                            <input
+                                              type="number"
+                                              min="0"
+                                              step="0.01"
+                                              className="w-full h-10 text-sm border border-gray-300 rounded-md px-3 bg-gray-100 text-gray-700 focus:outline-none"
+                                              value={
+                                                (parseFloat(container.cargoTotalWeight) || 0) +
+                                                (parseFloat(container.containerTotalWeight) || 0)
+                                              }
+                                              disabled
+                                              placeholder="Gross Weight"
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
                 )}
               </div>
 
@@ -1079,9 +1178,7 @@ const ContainerDetailsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={
-                    isSubmitting || existingTransporterData.length === 0
-                  }
+                  disabled={isSubmitting || existingTransporterData.length === 0}
                   className={`
                     px-8 py-3 rounded-md text-white font-medium transition-all duration-200
                     ${
