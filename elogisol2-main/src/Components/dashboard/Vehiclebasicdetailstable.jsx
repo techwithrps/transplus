@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { driverAPI, vendorAPI, vehicleAPI } from "../../utils/Api";
-import ContainerDetailsPage from "../../Pages/Containerdetailspage";
 
 const VendorSearchInput = ({ value, onChange, placeholder }) => {
   const [vendors, setVendors] = useState([]);
@@ -8,13 +7,11 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(value || "");
   const [loading, setLoading] = useState(false);
-  const [vehicles, setVehicles] = useState([]);
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
 
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Self option object
   const selfOption = {
     VENDOR_ID: "SELF",
     VENDOR_NAME: "Self",
@@ -24,40 +21,18 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
   };
 
   useEffect(() => {
-    const fetchVehicles = async () => {
-      setLoading(true);
-      try {
-        const response = await vehicleAPI.getAllvehicles();
-        const vehiclesData = response.data || response || [];
-        if (Array.isArray(vehiclesData)) {
-          setVehicles(vehiclesData);
-        } else {
-          console.error("Vehicles data is not an array:", vehiclesData);
-        }
-      } catch (error) {
-        console.error("Error fetching vehicles:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVehicles();
-  }, []);
-
-  useEffect(() => {
     const fetchVendors = async () => {
       setLoading(true);
       try {
         const response = await vendorAPI.getAllVendors();
         const vendorsData = response.data || response || [];
         if (Array.isArray(vendorsData)) {
-          // Always add "Self" option at the beginning
           const vendorsWithSelf = [selfOption, ...vendorsData];
           setVendors(vendorsWithSelf);
           setFilteredVendors(vendorsWithSelf);
         }
       } catch (error) {
         console.error("Error fetching vendors:", error);
-        // Even if API fails, show Self option
         setVendors([selfOption]);
         setFilteredVendors([selfOption]);
       } finally {
@@ -83,13 +58,12 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
     setSearchTerm(value || "");
   }, [value]);
 
-  // Simple dropdown position calculation
   const calculateDropdownPosition = () => {
     if (!inputRef.current) return;
 
     const inputRect = inputRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    const dropdownHeight = 200; // Fixed smaller height
+    const dropdownHeight = 200;
 
     const spaceBelow = viewportHeight - inputRect.bottom;
     const spaceAbove = inputRect.top;
@@ -103,11 +77,9 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
 
   const handleFocus = () => {
     setIsOpen(true);
-    // Delay calculation to ensure filteredVendors is updated
     setTimeout(calculateDropdownPosition, 0);
   };
 
-  // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -137,17 +109,16 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
       window.removeEventListener("scroll", calculateDropdownPosition, true);
       window.removeEventListener("resize", calculateDropdownPosition);
     };
-  }, [isOpen, filteredVendors.length]);
+  }, [isOpen]);
 
-  // Simple dropdown position styles
   const getDropdownStyles = () => {
     if (!inputRef.current || !isOpen) return { display: "none" };
 
     const inputRect = inputRef.current.getBoundingClientRect();
 
     const styles = {
-      width: `${Math.max(inputRect.width, 200)}px`,
-      maxHeight: "200px", // Fixed height
+      width: `${Math.max(inputRect.width, 220)}px`,
+      maxHeight: "200px",
       zIndex: 9999,
     };
 
@@ -188,7 +159,6 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
         )}
       </div>
 
-      {/* Improved dropdown with constrained dimensions */}
       {isOpen && filteredVendors.length > 0 && (
         <div
           ref={dropdownRef}
@@ -199,7 +169,7 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
             <div
               key={vendor.VENDOR_ID}
               className={`px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                vendor.VENDOR_ID === "SELF" ? "bg-green-50 font-medium" : ""
+                vendor.VENDOR_ID === "SELF" ? "bg-green-50" : ""
               }`}
               onClick={() => {
                 setSearchTerm(vendor.VENDOR_NAME);
@@ -207,36 +177,19 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
                 setIsOpen(false);
               }}
             >
-              <div
-                className={`font-medium text-gray-900 truncate ${
-                  vendor.VENDOR_ID === "SELF" ? "text-green-800" : ""
-                }`}
-              >
+              <div className="font-medium text-gray-900 truncate">
                 {vendor.VENDOR_NAME}
                 {vendor.VENDOR_ID === "SELF" && (
-                  <span className="ml-2 text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">
-                    Own Vehicles
+                  <span className="ml-2 text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full">
+                    Own
                   </span>
                 )}
               </div>
-              <div className="text-sm text-gray-500 truncate">
-                {vendor.VENDOR_CODE || "No code"} |{" "}
-                {vendor.CITY || vendor.ADDRESS || "No location"}
+              <div className="text-xs text-gray-500 truncate">
+                {vendor.CITY || vendor.ADDRESS}
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {isOpen && filteredVendors.length === 0 && searchTerm && (
-        <div
-          ref={dropdownRef}
-          className="fixed bg-white border border-gray-300 rounded-md shadow-lg"
-          style={getDropdownStyles()}
-        >
-          <div className="px-3 py-2 text-gray-500 text-sm">
-            No vendors found matching "{searchTerm}"
-          </div>
         </div>
       )}
     </>
@@ -249,191 +202,93 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(value || "");
   const [loading, setLoading] = useState(false);
-  const [vendorId, setVendorId] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
-  const [vehicles, setVehicles] = useState([]);
+  const [vendorId, setVendorId] = useState(null);
 
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // First effect to get vendor ID when vendor name changes
   useEffect(() => {
-    const getVendorId = async () => {
+    const fetchVendorIdAndDrivers = async () => {
       if (!vendorName) {
-        setVendorId(null);
-        return;
-      }
-
-      // Handle "Self" vendor specially
-      if (vendorName === "Self") {
-        setVendorId("SELF");
-        return;
-      }
-
-      try {
-        console.log("Fetching vendors for name:", vendorName);
-        const vendorsResponse = await vendorAPI.getAllVendors();
-        const vendors = vendorsResponse.data || vendorsResponse || [];
-        console.log("All vendors:", vendors);
-        const vendor = vendors.find((v) => v.VENDOR_NAME === vendorName);
-
-        if (vendor) {
-          console.log("Found vendor:", vendor);
-          setVendorId(vendor.VENDOR_ID);
-        } else {
-          console.log("No vendor found with name:", vendorName);
-          setVendorId(null);
-        }
-      } catch (error) {
-        console.error("Error fetching vendor ID:", error);
-        setVendorId(null);
-      }
-    };
-
-    getVendorId();
-  }, [vendorName]);
-
-  // Second effect to fetch drivers/vehicles when vendor ID changes
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!vendorId) {
-        console.log("No vendor ID, clearing drivers");
         setDrivers([]);
         setFilteredDrivers([]);
-        setVehicles([]);
+        setVendorId(null);
         return;
       }
 
       setLoading(true);
       try {
-        if (vendorId === "SELF") {
-          // Fetch vehicles for self option
-          console.log("Fetching vehicles for Self option");
-          const vehiclesResponse = await vehicleAPI.getAllvehicles();
-          console.log("Vehicles response for SELF:", vehiclesResponse);
+        if (vendorName.toLowerCase() === "self") {
+          setVendorId("SELF");
+          const response = await vehicleAPI.getAllvehicles();
+          const vehiclesData = response.data || response || [];
 
-          // Handle different response structures
-          let vehiclesData = [];
-          if (vehiclesResponse && Array.isArray(vehiclesResponse)) {
-            vehiclesData = vehiclesResponse;
-          } else if (
-            vehiclesResponse &&
-            vehiclesResponse.data &&
-            Array.isArray(vehiclesResponse.data)
-          ) {
-            vehiclesData = vehiclesResponse.data;
-          } else if (
-            vehiclesResponse &&
-            Array.isArray(vehiclesResponse.vehicles)
-          ) {
-            vehiclesData = vehiclesResponse.vehicles;
-          } else {
-            console.warn(
-              "Unexpected vehicles response structure:",
-              vehiclesResponse
-            );
-            vehiclesData = [];
+          if (Array.isArray(vehiclesData)) {
+            const selfDrivers = vehiclesData.map((vehicle) => ({
+              DRIVER_ID: `SELF_VEHICLE_${vehicle.VEHICLE_ID || vehicle.ID}`,
+              DRIVER_NAME:
+                vehicle.OWNER_NAME || vehicle.DRIVER_NAME || vehicle.VEHICLE_NO,
+              MOBILE_NO:
+                vehicle.OWNER_CONTACT_NO ||
+                vehicle.CONTACT_NO ||
+                vehicle.MOBILE_NO ||
+                "",
+              CONTACT_NO:
+                vehicle.OWNER_CONTACT_NO ||
+                vehicle.CONTACT_NO ||
+                vehicle.MOBILE_NO ||
+                "",
+              DL_NO: vehicle.DL_NO || "",
+              VEHICLE_NO: vehicle.VEHICLE_NO || "",
+              VEHICLE_TYPE: vehicle.VEHICLE_TYPE || "",
+              MAKE: vehicle.MAKE || "",
+              MODEL: vehicle.MODEL || "",
+              YEAR: vehicle.YEAR || "",
+              IS_SELF_VEHICLE: true,
+            }));
+            setDrivers(selfDrivers);
+            setFilteredDrivers(selfDrivers);
           }
-
-          console.log("Processed vehicles data:", vehiclesData);
-          console.log("Number of vehicles found:", vehiclesData.length);
-
-          if (vehiclesData.length === 0) {
-            console.warn("No vehicles found in response");
-            setDrivers([]);
-            setFilteredDrivers([]);
-            setVehicles([]);
-            return;
-          }
-
-          // Convert vehicles to driver-like format for compatibility
-          const vehicleDrivers = vehiclesData.map((vehicle, index) => {
-            console.log(`Processing vehicle ${index + 1}:`, vehicle);
-
-            const driverName =
-              vehicle.OWNER_NAME ||
-              vehicle.owner_name ||
-              `Owner of ${
-                vehicle.VEHICLE_NUMBER ||
-                vehicle.vehicle_number ||
-                "Unknown Vehicle"
-              }`;
-
-            const vehicleNumber =
-              vehicle.VEHICLE_NUMBER ||
-              vehicle.vehicle_number ||
-              vehicle.VEHICLE_NO ||
-              "";
-            const ownerContact =
-              vehicle.OWNER_CONTACT ||
-              vehicle.owner_contact ||
-              vehicle.CONTACT_NO ||
-              "";
-            const vehicleType =
-              vehicle.VEHICLE_TYPE || vehicle.vehicle_type || "";
-            const make = vehicle.MAKE || vehicle.make || "";
-            const model = vehicle.MODEL || vehicle.model || "";
-            const year = vehicle.YEAR || vehicle.year || "";
-            const vehicleId =
-              vehicle.VEHICLE_ID || vehicle.vehicle_id || vehicle.id || index;
-
-            return {
-              DRIVER_ID: `VEHICLE_${vehicleId}`,
-              DRIVER_NAME: driverName,
-              CONTACT_NO: ownerContact,
-              MOBILE_NO: ownerContact,
-              DL_NO: "", // Vehicles don't have driver license info
-              DL_RENEWABLE_DATE: null,
-              VEHICLE_NO: vehicleNumber,
-              VEHICLE_ID: vehicleId,
-              VEHICLE_TYPE: vehicleType,
-              MAKE: make,
-              MODEL: model,
-              YEAR: year,
-              IS_SELF_VEHICLE: true, // Flag to identify self vehicles
-            };
-          });
-
-          console.log("Converted vehicle drivers:", vehicleDrivers);
-
-          setDrivers(vehicleDrivers);
-          setFilteredDrivers(vehicleDrivers);
-          setVehicles(vehiclesData);
         } else {
-          // Fetch drivers for regular vendor
-          console.log("Fetching drivers for vendor ID:", vendorId);
-          const driversResponse = await driverAPI.getDriversByVendorId(
-            vendorId
+          const vendorResponse = await vendorAPI.getAllVendors();
+          const vendors = vendorResponse.data || vendorResponse || [];
+          const selectedVendor = vendors.find(
+            (v) => v.VENDOR_NAME.toLowerCase() === vendorName.toLowerCase()
           );
-          console.log("Drivers response:", driversResponse);
-          const driversData = driversResponse.data || driversResponse || [];
-          console.log("Drivers data:", driversData);
-          setDrivers(driversData);
-          setFilteredDrivers(driversData);
-          setVehicles([]);
+
+          if (selectedVendor) {
+            setVendorId(selectedVendor.VENDOR_ID);
+            const driverResponse = await driverAPI.getAllDrivers();
+            const driversData = driverResponse.data || driverResponse || [];
+            if (Array.isArray(driversData)) {
+              const vendorDrivers = driversData.filter(
+                (d) =>
+                  d.VENDOR_ID === selectedVendor.VENDOR_ID ||
+                  d.VENDOR_NAME === selectedVendor.VENDOR_NAME
+              );
+              setDrivers(vendorDrivers);
+              setFilteredDrivers(vendorDrivers);
+            }
+          }
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        console.error("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          response: error.response,
-        });
-        setDrivers([]);
-        setFilteredDrivers([]);
-        setVehicles([]);
+        console.error("Error fetching drivers:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [vendorId]);
+    fetchVendorIdAndDrivers();
+  }, [vendorName]);
 
   useEffect(() => {
     if (searchTerm && drivers.length > 0) {
-      const filtered = drivers.filter((d) =>
-        d.DRIVER_NAME.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = drivers.filter(
+        (d) =>
+          d.DRIVER_NAME?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          d.VEHICLE_NO?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          d.MOBILE_NO?.includes(searchTerm)
       );
       setFilteredDrivers(filtered);
     } else {
@@ -445,13 +300,11 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
     setSearchTerm(value || "");
   }, [value]);
 
-  // Simple dropdown position calculation
   const calculateDropdownPosition = () => {
     if (!inputRef.current) return;
-
     const inputRect = inputRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    const dropdownHeight = 200; // Fixed smaller height
+    const dropdownHeight = 200;
 
     const spaceBelow = viewportHeight - inputRect.bottom;
     const spaceAbove = inputRect.top;
@@ -468,7 +321,6 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
     setTimeout(calculateDropdownPosition, 0);
   };
 
-  // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -483,26 +335,19 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      window.addEventListener("scroll", calculateDropdownPosition, true);
-      window.addEventListener("resize", calculateDropdownPosition);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("scroll", calculateDropdownPosition, true);
-      window.removeEventListener("resize", calculateDropdownPosition);
     };
-  }, [isOpen, filteredDrivers.length]);
+  }, [isOpen]);
 
-  // Simple dropdown position styles
   const getDropdownStyles = () => {
     if (!inputRef.current || !isOpen) return { display: "none" };
-
     const inputRect = inputRef.current.getBoundingClientRect();
 
     const styles = {
-      width: `${Math.max(inputRect.width, 250)}px`, // Increased width for vehicle info
-      maxHeight: "200px", // Fixed height
+      width: `${Math.max(inputRect.width, 260)}px`,
+      maxHeight: "200px",
       zIndex: 9999,
     };
 
@@ -515,54 +360,6 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
     }
 
     return styles;
-  };
-
-  // Helper function to format vehicle info
-  const getVehicleInfo = (driver) => {
-    if (vendorId === "SELF" || driver.IS_SELF_VEHICLE) {
-      // For self vehicles, show more detailed info
-      const vehicleInfo = [];
-      if (driver.VEHICLE_NO) vehicleInfo.push(`${driver.VEHICLE_NO}`);
-      if (driver.VEHICLE_TYPE) vehicleInfo.push(`(${driver.VEHICLE_TYPE})`);
-      if (driver.MAKE && driver.MODEL)
-        vehicleInfo.push(`${driver.MAKE} ${driver.MODEL}`);
-
-      return vehicleInfo.length > 0 ? vehicleInfo.join(" ") : "Own Vehicle";
-    } else {
-      // For vendor drivers
-      if (driver.VEHICLE_NO) {
-        return `Vehicle: ${driver.VEHICLE_NO}`;
-      } else if (driver.VEHICLE_ID) {
-        return `Vehicle ID: ${driver.VEHICLE_ID}`;
-      } else {
-        return "No vehicle assigned";
-      }
-    }
-  };
-
-  // Helper function to get contact info
-  const getContactInfo = (driver) => {
-    const contact = driver.CONTACT_NO || driver.MOBILE_NO;
-    const license = driver.DL_NO;
-
-    if (vendorId === "SELF" || driver.IS_SELF_VEHICLE) {
-      // For self vehicles, show owner contact and year
-      const info = [];
-      if (contact) info.push(contact);
-      if (driver.YEAR) info.push(`Year: ${driver.YEAR}`);
-      return info.length > 0 ? info.join(" | ") : "No contact info";
-    } else {
-      // For vendor drivers
-      if (contact && license) {
-        return `${contact} | License: ${license}`;
-      } else if (contact) {
-        return contact;
-      } else if (license) {
-        return `License: ${license}`;
-      } else {
-        return "No contact info";
-      }
-    }
   };
 
   return (
@@ -592,7 +389,6 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
         )}
       </div>
 
-      {/* Enhanced dropdown with vehicle information */}
       {isOpen && filteredDrivers.length > 0 && (
         <div
           ref={dropdownRef}
@@ -602,160 +398,94 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
           {filteredDrivers.map((driver) => (
             <div
               key={driver.DRIVER_ID}
-              className={`px-3 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                vendorId === "SELF" || driver.IS_SELF_VEHICLE
-                  ? "bg-green-50"
-                  : ""
+              className={`px-3 py-2.5 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                vendorId === "SELF" || driver.IS_SELF_VEHICLE ? "bg-green-50" : ""
               }`}
               onClick={() => {
-                console.log("Selected driver/vehicle:", driver);
                 setSearchTerm(driver.DRIVER_NAME);
                 onChange(driver.DRIVER_NAME, driver);
                 setIsOpen(false);
               }}
             >
-              <div className="font-medium text-gray-900 truncate">
-                {driver.DRIVER_NAME}
+              <div className="font-medium text-gray-900 text-sm flex items-center justify-between">
+                <span>{driver.DRIVER_NAME}</span>
                 {(vendorId === "SELF" || driver.IS_SELF_VEHICLE) && (
-                  <span className="ml-2 text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full">
+                  <span className="text-[10px] bg-green-200 text-green-800 px-1.5 py-0.5 rounded-full font-medium">
                     Own
                   </span>
                 )}
               </div>
-              <div className="text-sm text-gray-500 truncate mt-1">
-                {getContactInfo(driver)}
-              </div>
-              <div
-                className={`text-sm truncate mt-1 ${
-                  vendorId === "SELF" || driver.IS_SELF_VEHICLE
-                    ? "text-green-600"
-                    : "text-blue-600"
-                }`}
-              >
-                {getVehicleInfo(driver)}
+              <div className="text-xs text-gray-500 truncate mt-0.5">
+                {driver.MOBILE_NO || driver.CONTACT_NO || "No contact"}
+                {driver.VEHICLE_NO && ` • Vehicle: ${driver.VEHICLE_NO}`}
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {isOpen && filteredDrivers.length === 0 && searchTerm && !loading && (
-        <div
-          ref={dropdownRef}
-          className="fixed bg-white border border-gray-300 rounded-md shadow-lg"
-          style={getDropdownStyles()}
-        >
-          <div className="px-3 py-2 text-gray-500 text-sm">
-            {vendorId === "SELF"
-              ? `No vehicles found matching "${searchTerm}"`
-              : `No drivers found matching "${searchTerm}"`}
-          </div>
-        </div>
-      )}
-
-      {isOpen &&
-        filteredDrivers.length === 0 &&
-        !searchTerm &&
-        !loading &&
-        vendorName && (
-          <div
-            ref={dropdownRef}
-            className="fixed bg-white border border-gray-300 rounded-md shadow-lg"
-            style={getDropdownStyles()}
-          >
-            <div className="px-3 py-2 text-gray-500 text-sm">
-              {vendorId === "SELF"
-                ? "No vehicles available"
-                : "No drivers available for this vendor"}
-            </div>
-          </div>
-        )}
-
-      {!vendorName && isOpen && (
-        <div
-          ref={dropdownRef}
-          className="fixed bg-white border border-gray-300 rounded-md shadow-lg"
-          style={getDropdownStyles()}
-        >
-          <div className="px-3 py-2 text-gray-500 text-sm">
-            Please select a vendor first
-          </div>
         </div>
       )}
     </>
   );
 };
 
-// Updated table component with vehicle number auto-fill
-// Add this function at the top of your VehicleBasicDetailsTable component
 const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
-  // Add this function to filter unique vehicles by vehicle number
-  const getUniqueVehicles = (vehicles) => {
-    // If no vehicles or empty array, return at least one empty vehicle
-    if (!vehicles || vehicles.length === 0) {
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Group vehicles and their associated container records
+  const groupedVehicles = useMemo(() => {
+    if (!vehicleDataList || vehicleDataList.length === 0) {
       return [
         {
-          vehicleIndex: 1,
-          vendorName: "",
-          transporterName: "",
-          vehicleNumber: "",
-          driverName: "",
-          driverContact: "",
-          licenseNumber: "",
-          licenseExpiry: "",
+          vehicle: {
+            vehicleIndex: 1,
+            vendorName: "",
+            transporterName: "",
+            vehicleNumber: "",
+            driverName: "",
+            driverContact: "",
+          },
+          primaryIndex: 0,
+          containers: [
+            {
+              originalIndex: 0,
+              containerNo: "",
+              containerSize: "20",
+              containerType: "DV",
+              line: "",
+              seal1: "",
+              seal2: "",
+              cargoTotalWeight: "",
+              containerTotalWeight: "",
+            },
+          ],
         },
       ];
     }
 
-    const seenVehicleNumbers = new Set();
-    const uniqueVehicles = [];
+    const map = new Map();
 
-    vehicles.forEach((vehicle, index) => {
-      const vehicleNumber = vehicle.vehicleNumber?.trim().toUpperCase();
+    vehicleDataList.forEach((item, originalIndex) => {
+      // Group by assigned vehicle number or unique sequence/index
+      const vKey =
+        item.vehicleNumber?.trim().toUpperCase() ||
+        `UNASSIGNED_VEHICLE_${item.vehicleIndex || originalIndex}`;
 
-      // For empty vehicle numbers, always include them (for new entries)
-      if (!vehicleNumber) {
-        uniqueVehicles.push(vehicle);
-        return;
+      if (!map.has(vKey)) {
+        map.set(vKey, {
+          vehicle: item,
+          primaryIndex: originalIndex,
+          containers: [],
+        });
       }
 
-      // If vehicle number is already seen, skip it
-      if (seenVehicleNumbers.has(vehicleNumber)) {
-        console.log(
-          `Skipping duplicate vehicle number: ${vehicleNumber} at index ${index}`
-        );
-        return;
-      }
-
-      // Add to seen set and unique vehicles array
-      seenVehicleNumbers.add(vehicleNumber);
-      uniqueVehicles.push(vehicle);
+      map.get(vKey).containers.push({
+        ...item,
+        originalIndex,
+      });
     });
 
-    // Ensure at least one row is always shown
-    if (uniqueVehicles.length === 0) {
-      uniqueVehicles.push({
-        vehicleIndex: 1,
-        vendorName: "",
-        transporterName: "",
-        vehicleNumber: "",
-        driverName: "",
-        driverContact: "",
-        licenseNumber: "",
-        licenseExpiry: "",
-      });
-    }
+    return Array.from(map.values());
+  }, [vehicleDataList]);
 
-    console.log(
-      `Filtered ${vehicles.length} vehicles down to ${uniqueVehicles.length} unique vehicles`
-    );
-    return uniqueVehicles;
-  };
-
-  // Filter the vehicle data list to show only unique vehicle numbers
-  const uniqueVehicleDataList = getUniqueVehicles(vehicleDataList);
-
-  // Rest of your existing validation and handler functions remain the same...
   const validateVehicleData = (field, value) => {
     switch (field) {
       case "vehicleNumber":
@@ -764,27 +494,28 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
         return value.length >= 3 && /^[A-Za-z.\s]+$/.test(value);
       case "driverContact":
         return /^\d{10}$/.test(value);
-      case "licenseNumber":
-        return value.length >= 5 && /^[A-Z0-9]+$/.test(value);
-      case "licenseExpiry":
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const expiryDate = new Date(value);
-        return expiryDate >= today;
       default:
         return true;
     }
   };
 
-  const [validationErrors, setValidationErrors] = useState({});
-
-  const handleInputChange = (index, field, value) => {
-    // Find the original index in vehicleDataList for this unique vehicle
-    const originalIndex = vehicleDataList.findIndex(
-      (v) => v.vehicleIndex === uniqueVehicleDataList[index].vehicleIndex
-    );
-
+  const handleInputChange = (originalIndex, field, value) => {
     updateVehicleData(originalIndex, field, value);
+
+    // If updating vehicle number, synchronize across twin containers of this vehicle
+    if (field === "vehicleNumber") {
+      const oldVehicle = vehicleDataList[originalIndex];
+      const oldVNum = oldVehicle?.vehicleNumber?.trim().toUpperCase();
+
+      if (oldVNum) {
+        vehicleDataList.forEach((v, idx) => {
+          if (idx !== originalIndex && v.vehicleNumber?.trim().toUpperCase() === oldVNum) {
+            updateVehicleData(idx, "vehicleNumber", value);
+          }
+        });
+      }
+    }
+
     const isValid = validateVehicleData(field, value);
     setValidationErrors((prev) => ({
       ...prev,
@@ -794,22 +525,23 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
     }));
   };
 
-  const handleVendorChange = (index, vendorName) => {
-    // Find the original index in vehicleDataList for this unique vehicle
-    const originalIndex = vehicleDataList.findIndex(
-      (v) => v.vehicleIndex === uniqueVehicleDataList[index].vehicleIndex
-    );
-
+  const handleVendorChange = (originalIndex, vendorName) => {
     updateVehicleData(originalIndex, "vendorName", vendorName);
     updateVehicleData(originalIndex, "transporterName", vendorName);
+
+    // Sync across twin container rows for this vehicle
+    const currentVehicle = vehicleDataList[originalIndex];
+    if (currentVehicle?.vehicleNumber) {
+      vehicleDataList.forEach((v, idx) => {
+        if (idx !== originalIndex && v.vehicleNumber === currentVehicle.vehicleNumber) {
+          updateVehicleData(idx, "vendorName", vendorName);
+          updateVehicleData(idx, "transporterName", vendorName);
+        }
+      });
+    }
   };
 
-  const handleDriverSelection = (index, driverName, driverData) => {
-    // Find the original index in vehicleDataList for this unique vehicle
-    const originalIndex = vehicleDataList.findIndex(
-      (v) => v.vehicleIndex === uniqueVehicleDataList[index].vehicleIndex
-    );
-
+  const handleDriverSelection = (originalIndex, driverName, driverData) => {
     if (driverData) {
       updateVehicleData(originalIndex, "driverName", driverName);
       updateVehicleData(
@@ -829,9 +561,44 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
         const formattedDate = date.toISOString().split("T")[0];
         updateVehicleData(originalIndex, "licenseExpiry", formattedDate);
       }
+
+      // Sync across twin rows for this vehicle
+      const currentVehicle = vehicleDataList[originalIndex];
+      if (currentVehicle?.vehicleNumber || driverData.VEHICLE_NO) {
+        const targetVNum = driverData.VEHICLE_NO || currentVehicle.vehicleNumber;
+        vehicleDataList.forEach((v, idx) => {
+          if (idx !== originalIndex && v.vehicleNumber === targetVNum) {
+            updateVehicleData(idx, "driverName", driverName);
+            updateVehicleData(
+              idx,
+              "driverContact",
+              driverData.MOBILE_NO || driverData.CONTACT_NO || ""
+            );
+            updateVehicleData(idx, "vehicleNumber", driverData.VEHICLE_NO || "");
+          }
+        });
+      }
     } else {
       updateVehicleData(originalIndex, "driverName", driverName);
     }
+  };
+
+  const handleAddContainerToVehicle = (vehicle) => {
+    // Clone vehicle base data and append as a new twin container row
+    const newRow = {
+      ...vehicle,
+      id: null,
+      containerNo: "",
+      line: "",
+      seal1: "",
+      seal2: "",
+      sealNo: "",
+      containerTotalWeight: "",
+      cargoTotalWeight: "",
+      containerType: "DV",
+      containerSize: "20",
+    };
+    updateVehicleData(null, "_insert_new_row", newRow);
   };
 
   const getVendorName = (vehicle) => {
@@ -839,136 +606,376 @@ const VehicleBasicDetailsTable = ({ vehicleDataList, updateVehicleData }) => {
   };
 
   return (
-    <div>
-      <h4 className="text-lg font-medium text-gray-900 mb-4">
-        Vehicle & Driver Information
-        <span className="text-sm font-normal text-gray-500 ml-2">
-          (All fields marked with * are required)
-        </span>
-      </h4>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h4 className="text-lg font-medium text-gray-900">
+          Vehicle & Container Details (Sub-Tree View)
+          <span className="text-sm font-normal text-gray-500 ml-2">
+            (All fields marked with * are required)
+          </span>
+        </h4>
+      </div>
 
-      <div className="overflow-x-auto border rounded-lg">
+      <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+              <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-16 text-center">
                 Vehicle #
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[180px]">
+              <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[180px]">
                 Vendor Name *
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px]">
+              <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
                 Vehicle Number *
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px]">
+              <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]">
                 Assigner Name *
               </th>
-              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[160px]">
+              <th className="px-3 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[160px]">
                 Driver Contact *
+              </th>
+              <th className="px-3 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">
+                Actions
               </th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
-            {uniqueVehicleDataList.map((vehicle, index) => {
-              // Find original index for validation errors
-              const originalIndex = vehicleDataList.findIndex(
-                (v) => v.vehicleIndex === vehicle.vehicleIndex
-              );
+            {groupedVehicles.map((group, groupIndex) => {
+              const { vehicle, primaryIndex, containers } = group;
 
               return (
-                <tr
-                  key={`vehicle-${vehicle.vehicleIndex || index}`}
-                  className="hover:bg-gray-50"
-                >
-                  <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                    <div className="flex items-center justify-center">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold">
-                        {index + 1}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <VendorSearchInput
-                      value={getVendorName(vehicle)}
-                      onChange={(value) => handleVendorChange(index, value)}
-                      placeholder="Search and select vendor"
-                    />
-                  </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <div>
-                      <input
-                        type="text"
-                        className={`w-full min-w-[140px] border ${
-                          validationErrors[`${originalIndex}-vehicleNumber`]
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        } rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                        value={vehicle.vehicleNumber}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            "vehicleNumber",
-                            e.target.value.toUpperCase()
-                          )
-                        }
-                        placeholder="e.g., MH01AB1234"
-                        pattern="[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}"
-                        title="Vehicle number must be in format like MH01AB1234"
-                        required
+                <React.Fragment key={`group-vehicle-${groupIndex}`}>
+                  {/* Parent Vehicle Row */}
+                  <tr className="bg-gray-50/80 hover:bg-blue-50/30 transition-colors border-t-2 border-gray-200">
+                    <td className="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center align-top">
+                      <div className="flex flex-col items-center justify-center space-y-1">
+                        <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-xs">
+                          {groupIndex + 1}
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-medium">
+                          {containers.length} cont.
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="px-3 py-3 whitespace-nowrap align-top">
+                      <VendorSearchInput
+                        value={getVendorName(vehicle)}
+                        onChange={(value) => handleVendorChange(primaryIndex, value)}
+                        placeholder="Search and select vendor"
                       />
-                      {validationErrors[`${originalIndex}-vehicleNumber`] && (
+                    </td>
+
+                    <td className="px-3 py-3 whitespace-nowrap align-top">
+                      <div>
+                        <input
+                          type="text"
+                          className={`w-full min-w-[140px] border ${
+                            validationErrors[`${primaryIndex}-vehicleNumber`]
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } rounded-md p-2 text-sm uppercase font-mono font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          value={vehicle.vehicleNumber || ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              primaryIndex,
+                              "vehicleNumber",
+                              e.target.value.toUpperCase()
+                            )
+                          }
+                          placeholder="e.g. MH01AB1234"
+                          pattern="[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}"
+                          title="Vehicle number must be in format like MH01AB1234"
+                          required
+                        />
+                        {validationErrors[`${primaryIndex}-vehicleNumber`] && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {validationErrors[`${primaryIndex}-vehicleNumber`]}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="px-3 py-3 whitespace-nowrap align-top">
+                      <DriverSearchInput
+                        value={vehicle.driverName || ""}
+                        onChange={(value, driverData) =>
+                          handleDriverSelection(primaryIndex, value, driverData)
+                        }
+                        vendorName={getVendorName(vehicle)}
+                        placeholder="Select driver"
+                      />
+                      {validationErrors[`${primaryIndex}-driverName`] && (
                         <p className="text-red-500 text-xs mt-1">
-                          {validationErrors[`${originalIndex}-vehicleNumber`]}
+                          {validationErrors[`${primaryIndex}-driverName`]}
                         </p>
                       )}
-                    </div>
-                  </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <DriverSearchInput
-                      value={vehicle.driverName}
-                      onChange={(value, driverData) =>
-                        handleDriverSelection(index, value, driverData)
-                      }
-                      vendorName={getVendorName(vehicle)}
-                      placeholder="Select driver"
-                    />
-                    {validationErrors[`${originalIndex}-driverName`] && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {validationErrors[`${originalIndex}-driverName`]}
-                      </p>
-                    )}
-                  </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <div>
-                      <input
-                        type="tel"
-                        className={`w-full min-w-[160px] border ${
-                          validationErrors[`${originalIndex}-driverContact`]
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        } rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                        value={vehicle.driverContact}
-                        onChange={(e) =>
-                          handleInputChange(
-                            index,
-                            "driverContact",
-                            e.target.value.replace(/\D/g, "").slice(0, 10)
-                          )
-                        }
-                        placeholder="10-digit mobile number"
-                        pattern="\d{10}"
-                        title="Driver contact must be exactly 10 digits"
-                        maxLength="10"
-                        required
-                      />
-                      {validationErrors[`${originalIndex}-driverContact`] && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {validationErrors[`${originalIndex}-driverContact`]}
-                        </p>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                    </td>
+
+                    <td className="px-3 py-3 whitespace-nowrap align-top">
+                      <div>
+                        <input
+                          type="tel"
+                          className={`w-full min-w-[160px] border ${
+                            validationErrors[`${primaryIndex}-driverContact`]
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          value={vehicle.driverContact || ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              primaryIndex,
+                              "driverContact",
+                              e.target.value.replace(/\D/g, "").slice(0, 10)
+                            )
+                          }
+                          placeholder="10-digit mobile"
+                          pattern="\d{10}"
+                          title="Driver contact must be exactly 10 digits"
+                          maxLength="10"
+                          required
+                        />
+                        {validationErrors[`${primaryIndex}-driverContact`] && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {validationErrors[`${primaryIndex}-driverContact`]}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="px-3 py-3 whitespace-nowrap text-center align-top">
+                      <button
+                        type="button"
+                        onClick={() => handleAddContainerToVehicle(vehicle)}
+                        className="inline-flex items-center px-2.5 py-1.5 border border-blue-600 shadow-xs text-xs font-medium rounded text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 cursor-pointer"
+                        title="Add twin container to this vehicle"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 4v16m8-8H4"
+                          />
+                        </svg>
+                        + Container
+                      </button>
+                    </td>
+                  </tr>
+
+                  {/* Sub-Tree Branch: Nested Containers for this Vehicle */}
+                  <tr>
+                    <td colSpan="6" className="p-0 bg-white">
+                      <div className="pl-6 pr-4 py-3 bg-gradient-to-r from-blue-50/40 via-gray-50/30 to-white border-l-4 border-blue-500 ml-4 my-2 rounded-r-lg shadow-xs">
+                        <div className="flex items-center mb-2.5 text-xs font-semibold text-blue-900">
+                          <svg
+                            className="w-4 h-4 mr-1.5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                            />
+                          </svg>
+                          Containers for Vehicle #{groupIndex + 1} ({vehicle.vehicleNumber || "Pending Vehicle No"}):
+                        </div>
+
+                        <div className="space-y-3">
+                          {containers.map((container, contIndex) => {
+                            const originalIdx = container.originalIndex;
+
+                            return (
+                              <div
+                                key={`sub-container-${originalIdx}`}
+                                className="bg-white border border-gray-200 rounded-lg p-3 shadow-xs relative hover:border-blue-300 transition-colors"
+                              >
+                                <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-gray-100">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-xs font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
+                                      Container {contIndex + 1}
+                                    </span>
+                                    {container.containerNo && (
+                                      <span className="text-xs font-mono font-bold text-blue-700">
+                                        {container.containerNo}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {containers.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        updateVehicleData(
+                                          originalIdx,
+                                          "_remove_row",
+                                          null
+                                        )
+                                      }
+                                      className="text-xs text-red-600 hover:text-red-800 font-medium inline-flex items-center cursor-pointer"
+                                      title="Remove container"
+                                    >
+                                      <svg
+                                        className="w-3.5 h-3.5 mr-0.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                        />
+                                      </svg>
+                                      Remove
+                                    </button>
+                                  )}
+                                </div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 text-xs">
+                                  {/* Container Number */}
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-gray-600 mb-1">
+                                      Container No *
+                                    </label>
+                                    <input
+                                      type="text"
+                                      className="w-full border border-gray-300 rounded p-1.5 text-xs uppercase font-mono font-semibold focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                      value={container.containerNo || ""}
+                                      onChange={(e) => {
+                                        let val = e.target.value.toUpperCase();
+                                        if (val.length > 11) val = val.substring(0, 11);
+                                        updateVehicleData(originalIdx, "containerNo", val);
+                                      }}
+                                      placeholder="ABCD1234567"
+                                      maxLength="11"
+                                    />
+                                  </div>
+
+                                  {/* Container Size */}
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-gray-600 mb-1">
+                                      Size
+                                    </label>
+                                    <select
+                                      className="w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                      value={container.containerSize || "20"}
+                                      onChange={(e) =>
+                                        updateVehicleData(
+                                          originalIdx,
+                                          "containerSize",
+                                          e.target.value
+                                        )
+                                      }
+                                    >
+                                      <option value="20">20 ft</option>
+                                      <option value="40">40 ft</option>
+                                      <option value="45">45 ft</option>
+                                    </select>
+                                  </div>
+
+                                  {/* Container Type */}
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-gray-600 mb-1">
+                                      Type
+                                    </label>
+                                    <select
+                                      className="w-full border border-gray-300 rounded p-1.5 text-xs bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                      value={container.containerType || "DV"}
+                                      onChange={(e) =>
+                                        updateVehicleData(
+                                          originalIdx,
+                                          "containerType",
+                                          e.target.value
+                                        )
+                                      }
+                                    >
+                                      <option value="DV">DV</option>
+                                      <option value="HQ">HQ</option>
+                                      <option value="REFER">REFER</option>
+                                      <option value="OT">OT</option>
+                                      <option value="FR">FR</option>
+                                    </select>
+                                  </div>
+
+                                  {/* Shipping Line */}
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-gray-600 mb-1">
+                                      Shipping Line
+                                    </label>
+                                    <input
+                                      type="text"
+                                      className="w-full border border-gray-300 rounded p-1.5 text-xs uppercase focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                      value={container.line || ""}
+                                      onChange={(e) =>
+                                        updateVehicleData(
+                                          originalIdx,
+                                          "line",
+                                          e.target.value.toUpperCase()
+                                        )
+                                      }
+                                      placeholder="Shipping Line"
+                                    />
+                                  </div>
+
+                                  {/* Seal 1 */}
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-gray-600 mb-1">
+                                      Seal 1
+                                    </label>
+                                    <input
+                                      type="text"
+                                      className="w-full border border-gray-300 rounded p-1.5 text-xs uppercase focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                      value={container.seal1 || container.sealNo || ""}
+                                      onChange={(e) => {
+                                        const val = e.target.value.toUpperCase();
+                                        updateVehicleData(originalIdx, "seal1", val);
+                                        updateVehicleData(originalIdx, "sealNo", val);
+                                      }}
+                                      placeholder="Seal 1"
+                                    />
+                                  </div>
+
+                                  {/* Cargo Weight */}
+                                  <div>
+                                    <label className="block text-[11px] font-medium text-gray-600 mb-1">
+                                      Cargo Wt (kg)
+                                    </label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                      value={container.cargoTotalWeight || ""}
+                                      onChange={(e) =>
+                                        updateVehicleData(
+                                          originalIdx,
+                                          "cargoTotalWeight",
+                                          e.target.value
+                                        )
+                                      }
+                                      placeholder="Cargo Weight"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </React.Fragment>
               );
             })}
           </tbody>
