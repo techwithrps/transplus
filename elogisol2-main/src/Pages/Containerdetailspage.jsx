@@ -1011,22 +1011,22 @@ const ContainerDetailsPage = () => {
                                   Sub-Tree Containers for Vehicle #{vehicleIdx + 1} ({vehicleNumber}):
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-4">
                                   {vehicleContainers.map(
                                     (container, containerIndex) => {
                                       return (
                                         <div
                                           key={container._uid}
-                                          className="border border-gray-200 rounded-xl p-4 bg-white shadow-xs relative hover:border-blue-300 transition-colors"
+                                          className="border border-gray-200 rounded-xl p-4.5 bg-white shadow-xs relative hover:border-blue-300 transition-colors w-full"
                                         >
                                           {/* Container Header */}
-                                          <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-                                            <div className="flex items-center space-x-2">
-                                              <span className="text-xs font-bold text-gray-800 bg-slate-100 px-2.5 py-1 rounded-md">
+                                          <div className="flex justify-between items-center mb-3.5 pb-2.5 border-b border-gray-100">
+                                            <div className="flex items-center space-x-2.5">
+                                              <span className="text-xs font-bold text-gray-800 bg-slate-100 px-3 py-1 rounded-md">
                                                 Container #{containerIndex + 1}
                                               </span>
                                               {container.containerNo && (
-                                                <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                                                <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
                                                   {container.containerNo}
                                                 </span>
                                               )}
@@ -1038,11 +1038,11 @@ const ContainerDetailsPage = () => {
                                                 onClick={() =>
                                                   removeContainer(container._uid)
                                                 }
-                                                className="inline-flex items-center p-1.5 border border-transparent rounded-full text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer shadow-xs transition-colors"
+                                                className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-500 cursor-pointer shadow-xs transition-colors"
                                                 title="Remove Container"
                                               >
                                                 <svg
-                                                  className="h-3.5 w-3.5"
+                                                  className="h-3.5 w-3.5 mr-1"
                                                   fill="none"
                                                   viewBox="0 0 24 24"
                                                   stroke="currentColor"
@@ -1051,15 +1051,16 @@ const ContainerDetailsPage = () => {
                                                     strokeLinecap="round"
                                                     strokeLinejoin="round"
                                                     strokeWidth={2}
-                                                    d="M6 18L18 6M6 6l12 12"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                                                   />
                                                 </svg>
+                                                Remove
                                               </button>
                                             )}
                                           </div>
 
-                                          {/* Fields Form Grid */}
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                          {/* Fields Form Grid - Full-Width List Card */}
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
                                             {/* Container Number */}
                                             <div>
                                               <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1231,7 +1232,7 @@ const ContainerDetailsPage = () => {
                                             </div>
 
                                             {/* Gross Weight */}
-                                            <div className="md:col-span-2">
+                                            <div>
                                               <label className="block text-xs font-medium text-gray-700 mb-1">
                                                 Gross Weight (kg)
                                               </label>
