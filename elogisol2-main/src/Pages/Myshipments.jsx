@@ -98,11 +98,35 @@ const ShipmentsPage = () => {
     if (!Array.isArray(containerDetails) || containerDetails.length === 0) {
       return 0;
     }
+    const vehicleCharges = new Map();
+    containerDetails.forEach((detail) => {
+      const vNum = (detail.vehicle_number || "").trim().toUpperCase();
+      let sTotal = 0;
+      if (detail.service_charges) {
+        try {
+          const sc = typeof detail.service_charges === "object"
+            ? detail.service_charges
+            : JSON.parse(detail.service_charges);
+          sTotal = Object.values(sc).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+        } catch (e) {}
+      }
+      const addCharge = parseFloat(detail.additional_charges || 0);
+      const bCharge = parseFloat(detail.base_charge || 0);
+      const calc = sTotal + addCharge + bCharge;
+      const rowTotal = calc > 0 ? calc : parseFloat(detail.total_charge || 0);
 
-    return containerDetails.reduce((total, detail) => {
-      const vehicleTotal = parseFloat(detail.total_charge || 0);
-      return total + vehicleTotal;
-    }, 0);
+      if (vNum) {
+        if (!vehicleCharges.has(vNum)) {
+          vehicleCharges.set(vNum, rowTotal);
+        }
+      } else {
+        vehicleCharges.set(`_row_${detail.id || Math.random()}`, rowTotal);
+      }
+    });
+    return Array.from(vehicleCharges.values()).reduce(
+      (total, charge) => total + charge,
+      0
+    );
   };
 
   const loadTransporterDetails = async (requestId) => {

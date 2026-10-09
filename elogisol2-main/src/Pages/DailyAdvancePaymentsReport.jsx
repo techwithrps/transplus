@@ -257,11 +257,27 @@ export default function DailyAdvancePaymentsReport() {
           if (!Array.isArray(details) || details.length === 0) return 0;
           const vehicleChargesMap = new Map();
           details.forEach((detail) => {
-            if (detail.vehicle_number) {
-              vehicleChargesMap.set(
-                detail.vehicle_number,
-                parseFloat(detail.total_charge || 0)
-              );
+            const vNum = (detail.vehicle_number || "").trim().toUpperCase();
+            let sTotal = 0;
+            if (detail.service_charges) {
+              try {
+                const sc = typeof detail.service_charges === "object"
+                  ? detail.service_charges
+                  : JSON.parse(detail.service_charges);
+                sTotal = Object.values(sc).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+              } catch (e) {}
+            }
+            const addCharge = parseFloat(detail.additional_charges || 0);
+            const bCharge = parseFloat(detail.base_charge || 0);
+            const calc = sTotal + addCharge + bCharge;
+            const rowTotal = calc > 0 ? calc : parseFloat(detail.total_charge || 0);
+
+            if (vNum) {
+              if (!vehicleChargesMap.has(vNum)) {
+                vehicleChargesMap.set(vNum, rowTotal);
+              }
+            } else {
+              vehicleChargesMap.set(`_row_${detail.id || Math.random()}`, rowTotal);
             }
           });
           return Array.from(vehicleChargesMap.values()).reduce(

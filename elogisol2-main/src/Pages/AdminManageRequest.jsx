@@ -201,32 +201,71 @@ const AdminManageRequest = ({
                   vehicleContainerMapping = details.reduce((acc, detail) => {
                     const vehicleNum = detail.vehicle_number || "Unknown";
                     if (!acc[vehicleNum]) {
+                      let sTotal = 0;
+                      if (detail.service_charges) {
+                        try {
+                          const sc = typeof detail.service_charges === "object"
+                            ? detail.service_charges
+                            : JSON.parse(detail.service_charges);
+                          sTotal = Object.values(sc).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+                        } catch (e) {}
+                      }
+                      const addCharge = parseFloat(detail.additional_charges || 0);
+                      const bCharge = parseFloat(detail.base_charge || 0);
+                      const calc = sTotal + addCharge + bCharge;
+
                       acc[vehicleNum] = {
                         containers: [],
                         container_types: [],
                         container_sizes: [],
-                        total_charge: 0,
+                        total_charge: calc > 0 ? calc : parseFloat(detail.total_charge || 0),
                       };
                     }
                     if (detail.container_no) {
-                      acc[vehicleNum].containers.push(detail.container_no);
-                      acc[vehicleNum].container_types.push(
-                        detail.container_type || "N/A"
-                      );
-                      acc[vehicleNum].container_sizes.push(
-                        detail.container_size || "N/A"
-                      );
+                      if (!acc[vehicleNum].containers.includes(detail.container_no)) {
+                        acc[vehicleNum].containers.push(detail.container_no);
+                        acc[vehicleNum].container_types.push(
+                          detail.container_type || "N/A"
+                        );
+                        acc[vehicleNum].container_sizes.push(
+                          detail.container_size || "N/A"
+                        );
+                      }
                     }
-                    acc[vehicleNum].total_charge += parseFloat(
-                      detail.total_charge || 0
-                    );
                     return acc;
                   }, {});
                   transporterCache.set(shipment.id, transporterDetails);
                 }
               }
-              vehicleCharges = transporterDetails.reduce(
-                (sum, detail) => sum + parseFloat(detail.total_charge || 0),
+
+              const uniqueVehicleCharges = new Map();
+              transporterDetails.forEach((detail) => {
+                const vNum = (detail.vehicle_number || "").trim().toUpperCase();
+                let sTotal = 0;
+                if (detail.service_charges) {
+                  try {
+                    const sc = typeof detail.service_charges === "object"
+                      ? detail.service_charges
+                      : JSON.parse(detail.service_charges);
+                    sTotal = Object.values(sc).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+                  } catch (e) {}
+                }
+                const addCharge = parseFloat(detail.additional_charges || 0);
+                const bCharge = parseFloat(detail.base_charge || 0);
+                const calc = sTotal + addCharge + bCharge;
+                const rowTotal = calc > 0 ? calc : parseFloat(detail.total_charge || 0);
+
+                if (vNum) {
+                  if (!uniqueVehicleCharges.has(vNum)) {
+                    uniqueVehicleCharges.set(vNum, rowTotal);
+                  }
+                } else {
+                  uniqueVehicleCharges.set(`_row_${detail.id || Math.random()}`, rowTotal);
+                }
+              });
+
+              vehicleCharges = Array.from(uniqueVehicleCharges.values()).reduce(
+                (sum, charge) => sum + charge,
                 0
               );
               vehicleCount = [
@@ -249,8 +288,8 @@ const AdminManageRequest = ({
               totalPaid >= serviceCharges
                 ? "Fully Paid"
                 : totalPaid > 0
-                ? "Partially Paid"
-                : "Unpaid";
+                  ? "Partially Paid"
+                  : "Unpaid";
             const outstandingAmount = Math.max(0, serviceCharges - totalPaid);
 
             return {
@@ -563,18 +602,18 @@ const AdminManageRequest = ({
       } else {
         toast.error(
           response.data.message ||
-            (selectedRequest.id
-              ? "Failed to update request"
-              : "Failed to create trip")
+          (selectedRequest.id
+            ? "Failed to update request"
+            : "Failed to create trip")
         );
       }
     } catch (error) {
       console.error("Submit error:", error);
       toast.error(
         error.response?.data?.message ||
-          (selectedRequest.id
-            ? "Failed to update request"
-            : "Failed to create trip")
+        (selectedRequest.id
+          ? "Failed to update request"
+          : "Failed to create trip")
       );
     } finally {
       setIsSubmitting(false);
@@ -826,11 +865,10 @@ const AdminManageRequest = ({
                       <div
                         key={report.id}
                         onClick={() => handleReportClick(report)}
-                        className={`border rounded-lg p-3 transition-all duration-200 ${
-                          report.customer_id === user.id
+                        className={`border rounded-lg p-3 transition-all duration-200 ${report.customer_id === user.id
                             ? "cursor-not-allowed opacity-60"
                             : "cursor-pointer hover:border-blue-300 hover:shadow-sm"
-                        }`}
+                          }`}
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex-1 min-w-0">
