@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { generateInvoice } from "../utils/pdfGenerator";
 import ServiceRequestForm from "../Components/dashboard/Servicerequest";
@@ -88,6 +88,46 @@ export default function CustomerDashboard({
   const [consigner, setConsigner] = useState("");
   const [isFiltered, setIsFiltered] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
+  const [consignersList, setConsignersList] = useState([]);
+  const [isConsignerOpen, setIsConsignerOpen] = useState(false);
+  const consignerDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const fetchConsigners = async () => {
+      try {
+        const response = await api.get("/transport-requests/consigners/list");
+        if (response.data && Array.isArray(response.data.data)) {
+          setConsignersList(response.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching consigners list:", err);
+      }
+    };
+    fetchConsigners();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        consignerDropdownRef.current &&
+        !consignerDropdownRef.current.contains(event.target)
+      ) {
+        setIsConsignerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredConsigners = useMemo(() => {
+    if (!consigner.trim()) {
+      return consignersList.slice(0, 15);
+    }
+    const term = consigner.trim().toLowerCase();
+    return consignersList
+      .filter((c) => (c || "").toLowerCase().includes(term))
+      .slice(0, 20);
+  }, [consigner, consignersList]);
 
   const transporterCache = useMemo(() => new Map(), []);
 
@@ -746,18 +786,47 @@ export default function CustomerDashboard({
                         <Search className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
-                    <div className="relative">
+                    <div className="relative" ref={consignerDropdownRef}>
                       <input
                         type="text"
                         value={consigner}
-                        onChange={(e) => setConsigner(e.target.value)}
+                        onChange={(e) => {
+                          setConsigner(e.target.value);
+                          setIsConsignerOpen(true);
+                        }}
+                        onFocus={() => setIsConsignerOpen(true)}
                         onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         placeholder="Consigner"
                         className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        autoComplete="off"
                       />
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
                         <Search className="h-4 w-4 text-gray-400" />
                       </div>
+                      {isConsignerOpen && filteredConsigners.length > 0 && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50 divide-y divide-gray-100">
+                          {filteredConsigners.map((cName, idx) => (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setConsigner(cName);
+                                setIsConsignerOpen(false);
+                                setCurrentPage(1);
+                                setIsFiltered(true);
+                                fetchRequests(1, true, {
+                                  requestId: requestId.trim(),
+                                  shipaNo: shipaNo.trim(),
+                                  containerNo: containerNo.trim(),
+                                  consigner: cName,
+                                });
+                              }}
+                              className="px-3 py-2 text-xs text-gray-800 hover:bg-blue-50 hover:text-blue-700 cursor-pointer transition-colors"
+                            >
+                              {cName}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex space-x-2 pt-1">

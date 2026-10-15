@@ -70,8 +70,9 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
 
   useEffect(() => {
     if (searchTerm && vendors.length > 0) {
+      const term = searchTerm.toLowerCase();
       const filtered = vendors.filter((v) =>
-        v.VENDOR_NAME.toLowerCase().includes(searchTerm.toLowerCase())
+        (v.VENDOR_NAME || "").toLowerCase().includes(term)
       );
       setFilteredVendors(filtered);
     } else {
@@ -174,6 +175,7 @@ const VendorSearchInput = ({ value, onChange, placeholder }) => {
             setSearchTerm(e.target.value);
             onChange(e.target.value);
             setIsOpen(true);
+            setTimeout(calculateDropdownPosition, 0);
           }}
           onFocus={handleFocus}
           placeholder={placeholder}
@@ -296,14 +298,6 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
   // Second effect to fetch drivers/vehicles when vendor ID changes
   useEffect(() => {
     const fetchData = async () => {
-      if (!vendorId) {
-        console.log("No vendor ID, clearing drivers");
-        setDrivers([]);
-        setFilteredDrivers([]);
-        setVehicles([]);
-        return;
-      }
-
       setLoading(true);
       try {
         if (vendorId === "SELF") {
@@ -312,7 +306,6 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
           const vehiclesResponse = await vehicleAPI.getAllvehicles();
           console.log("Vehicles response for SELF:", vehiclesResponse);
 
-          // Handle different response structures
           let vehiclesData = [];
           if (vehiclesResponse && Array.isArray(vehiclesResponse)) {
             vehiclesData = vehiclesResponse;
@@ -327,98 +320,88 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
             Array.isArray(vehiclesResponse.vehicles)
           ) {
             vehiclesData = vehiclesResponse.vehicles;
-          } else {
-            console.warn(
-              "Unexpected vehicles response structure:",
-              vehiclesResponse
-            );
-            vehiclesData = [];
           }
 
-          console.log("Processed vehicles data:", vehiclesData);
-          console.log("Number of vehicles found:", vehiclesData.length);
+          if (vehiclesData.length > 0) {
+            const vehicleDrivers = vehiclesData.map((vehicle, index) => {
+              const driverName =
+                vehicle.OWNER_NAME ||
+                vehicle.owner_name ||
+                `Owner of ${
+                  vehicle.VEHICLE_NUMBER ||
+                  vehicle.vehicle_number ||
+                  "Unknown Vehicle"
+                }`;
 
-          if (vehiclesData.length === 0) {
-            console.warn("No vehicles found in response");
-            setDrivers([]);
-            setFilteredDrivers([]);
-            setVehicles([]);
-            return;
-          }
-
-          // Convert vehicles to driver-like format for compatibility
-          const vehicleDrivers = vehiclesData.map((vehicle, index) => {
-            console.log(`Processing vehicle ${index + 1}:`, vehicle);
-
-            const driverName =
-              vehicle.OWNER_NAME ||
-              vehicle.owner_name ||
-              `Owner of ${
+              const vehicleNumber =
                 vehicle.VEHICLE_NUMBER ||
                 vehicle.vehicle_number ||
-                "Unknown Vehicle"
-              }`;
+                vehicle.VEHICLE_NO ||
+                "";
+              const ownerContact =
+                vehicle.OWNER_CONTACT ||
+                vehicle.owner_contact ||
+                vehicle.CONTACT_NO ||
+                "";
+              const vehicleType =
+                vehicle.VEHICLE_TYPE || vehicle.vehicle_type || "";
+              const make = vehicle.MAKE || vehicle.make || "";
+              const model = vehicle.MODEL || vehicle.model || "";
+              const year = vehicle.YEAR || vehicle.year || "";
+              const vehicleId =
+                vehicle.VEHICLE_ID || vehicle.vehicle_id || vehicle.id || index;
 
-            const vehicleNumber =
-              vehicle.VEHICLE_NUMBER ||
-              vehicle.vehicle_number ||
-              vehicle.VEHICLE_NO ||
-              "";
-            const ownerContact =
-              vehicle.OWNER_CONTACT ||
-              vehicle.owner_contact ||
-              vehicle.CONTACT_NO ||
-              "";
-            const vehicleType =
-              vehicle.VEHICLE_TYPE || vehicle.vehicle_type || "";
-            const make = vehicle.MAKE || vehicle.make || "";
-            const model = vehicle.MODEL || vehicle.model || "";
-            const year = vehicle.YEAR || vehicle.year || "";
-            const vehicleId =
-              vehicle.VEHICLE_ID || vehicle.vehicle_id || vehicle.id || index;
+              return {
+                DRIVER_ID: `VEHICLE_${vehicleId}`,
+                DRIVER_NAME: driverName,
+                CONTACT_NO: ownerContact,
+                MOBILE_NO: ownerContact,
+                DL_NO: "",
+                DL_RENEWABLE_DATE: null,
+                VEHICLE_NO: vehicleNumber,
+                VEHICLE_ID: vehicleId,
+                VEHICLE_TYPE: vehicleType,
+                MAKE: make,
+                MODEL: model,
+                YEAR: year,
+                IS_SELF_VEHICLE: true,
+              };
+            });
 
-            return {
-              DRIVER_ID: `VEHICLE_${vehicleId}`,
-              DRIVER_NAME: driverName,
-              CONTACT_NO: ownerContact,
-              MOBILE_NO: ownerContact,
-              DL_NO: "", // Vehicles don't have driver license info
-              DL_RENEWABLE_DATE: null,
-              VEHICLE_NO: vehicleNumber,
-              VEHICLE_ID: vehicleId,
-              VEHICLE_TYPE: vehicleType,
-              MAKE: make,
-              MODEL: model,
-              YEAR: year,
-              IS_SELF_VEHICLE: true, // Flag to identify self vehicles
-            };
-          });
-
-          console.log("Converted vehicle drivers:", vehicleDrivers);
-
-          setDrivers(vehicleDrivers);
-          setFilteredDrivers(vehicleDrivers);
-          setVehicles(vehiclesData);
-        } else {
-          // Fetch drivers for regular vendor
-          console.log("Fetching drivers for vendor ID:", vendorId);
-          const driversResponse = await driverAPI.getDriversByVendorId(
-            vendorId
-          );
-          console.log("Drivers response:", driversResponse);
-          const driversData = driversResponse.data || driversResponse || [];
-          console.log("Drivers data:", driversData);
-          setDrivers(driversData);
-          setFilteredDrivers(driversData);
-          setVehicles([]);
+            setDrivers(vehicleDrivers);
+            setFilteredDrivers(vehicleDrivers);
+            setVehicles(vehiclesData);
+            return;
+          }
         }
+
+        // For regular vendor or when no vendor is selected:
+        let driversList = [];
+        if (vendorId && Number(vendorId) > 0) {
+          try {
+            const driversResponse = await driverAPI.getDriversByVendorId(vendorId);
+            driversList = driversResponse.data || driversResponse || [];
+          } catch (e) {
+            console.warn("Could not fetch vendor-specific drivers, falling back:", e);
+          }
+        }
+
+        // Fallback to all drivers from master and previous trips
+        if (!Array.isArray(driversList) || driversList.length === 0) {
+          const allDriversResponse = await driverAPI.getAllDrivers();
+          driversList = allDriversResponse.data || allDriversResponse || [];
+        }
+
+        if (Array.isArray(driversList)) {
+          setDrivers(driversList);
+          setFilteredDrivers(driversList);
+        } else {
+          setDrivers([]);
+          setFilteredDrivers([]);
+        }
+        setVehicles([]);
       } catch (error) {
-        console.error("Error fetching data:", error);
-        console.error("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          response: error.response,
-        });
+        console.error("Error fetching drivers data:", error);
         setDrivers([]);
         setFilteredDrivers([]);
         setVehicles([]);
@@ -432,8 +415,11 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
 
   useEffect(() => {
     if (searchTerm && drivers.length > 0) {
+      const term = searchTerm.toLowerCase();
       const filtered = drivers.filter((d) =>
-        d.DRIVER_NAME.toLowerCase().includes(searchTerm.toLowerCase())
+        (d.DRIVER_NAME || "").toLowerCase().includes(term) ||
+        (d.MOBILE_NO || d.CONTACT_NO || "").includes(term) ||
+        (d.VEHICLE_NO || "").toLowerCase().includes(term)
       );
       setFilteredDrivers(filtered);
     } else {
@@ -577,10 +563,10 @@ const DriverSearchInput = ({ value, onChange, vendorName, placeholder }) => {
             setSearchTerm(e.target.value);
             onChange(e.target.value);
             setIsOpen(true);
+            setTimeout(calculateDropdownPosition, 0);
           }}
           onFocus={handleFocus}
-          placeholder={placeholder}
-          disabled={!vendorName}
+          placeholder={placeholder || "Select driver or type name"}
           required
           autoComplete="off"
         />

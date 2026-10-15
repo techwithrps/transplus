@@ -7,12 +7,16 @@ const {
   updateRequestStatus,
   updateRequest,
   getFilteredRequests,
+  getDistinctConsigners,
 } = require("../controller/transportRequestController");
 const auth = require("../middlewares/auth");
 const adminAuth = require("../middlewares/adminmiddleware");
 
 // Protect all routes with authentication
 router.use(auth);
+
+// Get consigners list for auto-suggest
+router.get("/consigners/list", getDistinctConsigners);
 
 // Create new transport request
 router.post("/create", createRequest);

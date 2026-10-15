@@ -533,3 +533,28 @@ exports.getFilteredRequests = async (req, res) => {
     });
   }
 };
+
+exports.getDistinctConsigners = async (req, res) => {
+  try {
+    const result = await pool.request().query(`
+      SELECT DISTINCT consigner 
+      FROM transport_requests 
+      WHERE consigner IS NOT NULL AND LTRIM(RTRIM(consigner)) != ''
+      UNION
+      SELECT DISTINCT consignee 
+      FROM transport_requests 
+      WHERE consignee IS NOT NULL AND LTRIM(RTRIM(consignee)) != ''
+      ORDER BY consigner
+    `);
+    const consigners = result.recordset
+      .map((r) => r.consigner?.trim())
+      .filter(Boolean);
+    res.status(200).json({ success: true, data: consigners });
+  } catch (error) {
+    console.error("Get distinct consigners error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching consigners list",
+    });
+  }
+};

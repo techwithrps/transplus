@@ -11,7 +11,48 @@ class DriverModel {
           v.VENDOR_CODE
         FROM DRIVER_MASTER d
         LEFT JOIN VENDOR_MASTER v ON d.VENDOR_ID = v.VENDOR_ID
-        ORDER BY d.DRIVER_NAME
+        UNION ALL
+        SELECT 
+          -(ROW_NUMBER() OVER (ORDER BY t.driver_name)) AS DRIVER_ID,
+          NULL AS VENDOR_ID,
+          NULL AS TERMINAL_ID,
+          t.driver_name AS DRIVER_NAME,
+          NULL AS ADDRESS,
+          NULL AS VEHICLE_ID,
+          MAX(t.vehicle_number) AS VEHICLE_NO,
+          MAX(t.driver_contact) AS CONTACT_NO,
+          MAX(t.driver_contact) AS MOBILE_NO,
+          NULL AS EMAIL_ID,
+          NULL AS BLOOD_GROUP,
+          NULL AS JOINING_DATE,
+          MAX(t.license_number) AS DL_NO,
+          NULL AS DL_RENEWABLE_DATE,
+          NULL AS SALARY,
+          'Y' AS ACTIVE_FLAGE,
+          NULL AS CREATED_BY,
+          NULL AS CREATED_ON,
+          NULL AS IMAGE,
+          NULL AS BAL_AMT,
+          NULL AS TRIP_BAL,
+          NULL AS CLOSE_STATUS,
+          NULL AS JO_CLOSE_STATUS,
+          NULL AS GAURANTOR,
+          NULL AS DRIVER_CODE,
+          NULL AS FATHER_NAME,
+          NULL AS ATTACH_STATUS,
+          NULL AS DL_DOC,
+          NULL AS ADDRESS_DOC,
+          NULL AS EMERG_PHONE,
+          NULL AS PHONE_NO,
+          MAX(t.transporter_name) AS VENDOR_NAME,
+          'HISTORIC' AS VENDOR_CODE
+        FROM transporter_details t
+        WHERE t.driver_name IS NOT NULL AND LTRIM(RTRIM(t.driver_name)) != ''
+          AND NOT EXISTS (
+            SELECT 1 FROM DRIVER_MASTER dm WHERE UPPER(LTRIM(RTRIM(dm.DRIVER_NAME))) = UPPER(LTRIM(RTRIM(t.driver_name)))
+          )
+        GROUP BY t.driver_name
+        ORDER BY DRIVER_NAME
       `);
       return result.recordset;
     } catch (error) {
@@ -291,21 +332,30 @@ class DriverModel {
   // Get drivers by vendor ID
   static async getByVendorId(vendorId) {
     try {
-      const result = await pool
-        .request()
-        .input("vendor_id", sql.Numeric(10, 0), vendorId)
-        .query(`
-          SELECT 
-            d.*,
-            v.VENDOR_NAME,
-            v.VENDOR_CODE
-          FROM DRIVER_MASTER d
-          LEFT JOIN VENDOR_MASTER v ON d.VENDOR_ID = v.VENDOR_ID
-          WHERE d.VENDOR_ID = @vendor_id
-          ORDER BY d.DRIVER_NAME
-        `);
+      let drivers = [];
+      if (vendorId && Number(vendorId) > 0) {
+        const result = await pool
+          .request()
+          .input("vendor_id", sql.Numeric(10, 0), vendorId)
+          .query(`
+            SELECT 
+              d.*,
+              v.VENDOR_NAME,
+              v.VENDOR_CODE
+            FROM DRIVER_MASTER d
+            LEFT JOIN VENDOR_MASTER v ON d.VENDOR_ID = v.VENDOR_ID
+            WHERE d.VENDOR_ID = @vendor_id
+            ORDER BY d.DRIVER_NAME
+          `);
+        drivers = result.recordset || [];
+      }
 
-      return result.recordset;
+      // If no drivers found in master for this vendor, fallback to all available drivers
+      if (drivers.length === 0) {
+        return await this.getAll();
+      }
+
+      return drivers;
     } catch (error) {
       console.error("Get drivers by vendor ID error:", error);
       throw error;
