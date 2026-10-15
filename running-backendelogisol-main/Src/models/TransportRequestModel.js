@@ -322,19 +322,19 @@ class TransportRequest {
 
       if (shipa_no) {
         whereClauses.push(`tr.SHIPA_NO LIKE @shipa_no`);
-        request.input("shipa_no", sql.NVarChar, `%${shipa_no}%`);
+        request.input("shipa_no", sql.NVarChar, `%${shipa_no.trim()}%`);
       }
       if (request_id) {
-        whereClauses.push(`tr.id = @request_id`);
-        request.input("request_id", sql.Int, request_id);
+        whereClauses.push(`(CAST(tr.id AS VARCHAR) LIKE @request_id OR tr.formatted_request_id LIKE @request_id)`);
+        request.input("request_id", sql.NVarChar, `%${request_id.trim()}%`);
       }
       if (container_no) {
         whereClauses.push(`td.container_no LIKE @container_no`);
-        request.input("container_no", sql.NVarChar, `%${container_no}%`);
+        request.input("container_no", sql.NVarChar, `%${container_no.trim()}%`);
       }
       if (consigner) {
-        whereClauses.push(`tr.consigner LIKE @consigner`);
-        request.input("consigner", sql.NVarChar, `%${consigner}%`);
+        whereClauses.push(`(tr.consigner LIKE @consigner OR tr.consignee LIKE @consigner)`);
+        request.input("consigner", sql.NVarChar, `%${consigner.trim()}%`);
       }
       if (date) {
         whereClauses.push(`CONVERT(date, tr.created_at) = @date`);

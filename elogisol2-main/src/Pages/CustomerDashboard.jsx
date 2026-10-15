@@ -92,27 +92,32 @@ export default function CustomerDashboard({
   const transporterCache = useMemo(() => new Map(), []);
 
   const fetchRequests = useCallback(
-    async (page, applyFilters = false) => {
+    async (page, applyFilters = false, filterOverrides = null) => {
       setLoading(true);
       try {
+        const activeFilters = filterOverrides || {
+          requestId,
+          shipaNo,
+          containerNo,
+          consigner,
+        };
+
+        const hasAnyFilter = Boolean(
+          (activeFilters.requestId && activeFilters.requestId.trim()) ||
+          (activeFilters.shipaNo && activeFilters.shipaNo.trim()) ||
+          (activeFilters.containerNo && activeFilters.containerNo.trim()) ||
+          (activeFilters.consigner && activeFilters.consigner.trim())
+        );
+
         const params = { page, limit: requestsPerPage, customer_id: user.id };
         let endpoint = "/transport-requests/all"; // Default endpoint
 
-        if (applyFilters) {
-          if (!requestId && !shipaNo && !containerNo && !consigner) {
-            toast.info(
-              "Please enter a Request ID, SHIPA No, Container No, or Consigner to search."
-            );
-            setPastRequests([]);
-            setTotalPages(1);
-            setLoading(false);
-            return;
-          }
+        if (applyFilters && hasAnyFilter) {
           endpoint = "/transport-requests/filtered";
-          if (requestId) params.request_id = requestId;
-          if (shipaNo) params.shipa_no = shipaNo;
-          if (containerNo) params.container_no = containerNo;
-          if (consigner) params.consigner = consigner;
+          if (activeFilters.requestId?.trim()) params.request_id = activeFilters.requestId.trim();
+          if (activeFilters.shipaNo?.trim()) params.shipa_no = activeFilters.shipaNo.trim();
+          if (activeFilters.containerNo?.trim()) params.container_no = activeFilters.containerNo.trim();
+          if (activeFilters.consigner?.trim()) params.consigner = activeFilters.consigner.trim();
         }
 
         const response = await api.get(endpoint, { params });
@@ -159,9 +164,54 @@ export default function CustomerDashboard({
     [user.id, requestsPerPage, requestId, shipaNo, containerNo, consigner]
   );
 
+  // Initial load or page change
   useEffect(() => {
     fetchRequests(currentPage, isFiltered);
-  }, [currentPage, isFiltered]);
+  }, [currentPage]);
+
+  // Live auto-search as user types 2-3 characters (debounced)
+  useEffect(() => {
+    const rId = requestId.trim();
+    const sNo = shipaNo.trim();
+    const cNo = containerNo.trim();
+    const csg = consigner.trim();
+
+    const hasSearchText =
+      rId.length >= 2 ||
+      sNo.length >= 2 ||
+      cNo.length >= 2 ||
+      csg.length >= 2;
+
+    const areAllEmpty = !rId && !sNo && !cNo && !csg;
+
+    if (hasSearchText) {
+      const timer = setTimeout(() => {
+        setIsFiltered(true);
+        setCurrentPage(1);
+        fetchRequests(1, true, {
+          requestId: rId,
+          shipaNo: sNo,
+          containerNo: cNo,
+          consigner: csg,
+        });
+      }, 350);
+
+      return () => clearTimeout(timer);
+    } else if (areAllEmpty && isFiltered) {
+      const timer = setTimeout(() => {
+        setIsFiltered(false);
+        setCurrentPage(1);
+        fetchRequests(1, false, {
+          requestId: "",
+          shipaNo: "",
+          containerNo: "",
+          consigner: "",
+        });
+      }, 250);
+
+      return () => clearTimeout(timer);
+    }
+  }, [requestId, shipaNo, containerNo, consigner]);
 
   // Restore active request if returning from Container/VIN page or reload
   useEffect(() => {
@@ -195,9 +245,26 @@ export default function CustomerDashboard({
   }, [requestData]);
 
   const handleSearch = () => {
+    const rId = requestId.trim();
+    const sNo = shipaNo.trim();
+    const cNo = containerNo.trim();
+    const csg = consigner.trim();
+
+    if (!rId && !sNo && !cNo && !csg) {
+      toast.info(
+        "Please enter a Request ID, SHIPA No, Container No, or Consigner to search."
+      );
+      return;
+    }
+
     setCurrentPage(1);
     setIsFiltered(true);
-    // fetchRequests will be called by the useEffect
+    fetchRequests(1, true, {
+      requestId: rId,
+      shipaNo: sNo,
+      containerNo: cNo,
+      consigner: csg,
+    });
   };
 
   const refreshData = () => {
@@ -207,7 +274,12 @@ export default function CustomerDashboard({
     setConsigner("");
     setIsFiltered(false);
     setCurrentPage(1);
-    // fetchRequests will be called by the useEffect
+    fetchRequests(1, false, {
+      requestId: "",
+      shipaNo: "",
+      containerNo: "",
+      consigner: "",
+    });
   };
 
   const toggleNotifications = () => {
@@ -640,6 +712,7 @@ export default function CustomerDashboard({
                         type="text"
                         value={requestId}
                         onChange={(e) => setRequestId(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         placeholder="Request ID"
                         className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
@@ -652,6 +725,7 @@ export default function CustomerDashboard({
                         type="text"
                         value={shipaNo}
                         onChange={(e) => setShipaNo(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         placeholder="SHIPA No"
                         className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
@@ -664,6 +738,7 @@ export default function CustomerDashboard({
                         type="text"
                         value={containerNo}
                         onChange={(e) => setContainerNo(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         placeholder="Container No"
                         className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
@@ -676,6 +751,7 @@ export default function CustomerDashboard({
                         type="text"
                         value={consigner}
                         onChange={(e) => setConsigner(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                         placeholder="Consigner"
                         className="block w-full h-9 rounded-md border-gray-300 pl-3 pr-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
